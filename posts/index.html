@@ -185,6 +185,61 @@
     
     
       
+        
+          <li>
+            <a
+              class="gblog-nav__entry"
+              href="/tags/hugo/"
+            >
+              Hugo
+            </a>
+          </li>
+        
+      
+        
+          <li>
+            <a
+              class="gblog-nav__entry"
+              href="/tags/python/"
+            >
+              Python
+            </a>
+          </li>
+        
+      
+        
+          <li>
+            <a
+              class="gblog-nav__entry"
+              href="/tags/%E5%8D%9A%E5%AE%A2/"
+            >
+              博客
+            </a>
+          </li>
+        
+      
+        
+          <li>
+            <a
+              class="gblog-nav__entry"
+              href="/tags/%E7%BD%91%E7%AB%99/"
+            >
+              网站
+            </a>
+          </li>
+        
+      
+        
+          <li>
+            <a
+              class="gblog-nav__entry"
+              href="/tags/%E8%87%AA%E7%94%A8/"
+            >
+              自用
+            </a>
+          </li>
+        
+      
     
     
   </ul>
@@ -296,6 +351,299 @@
 
 
 
+
+  
+    
+    
+      
+        <span class="flex align-center no-wrap gblog-post__meta--tag">
+          <svg class="gblog-icon gblog_bookmark"><use xlink:href="#gblog_bookmark"></use></svg>
+          
+  <span class="gblog-post__tag gblog-button gblog-button--regular">
+    <a
+      class="gblog-button__link"
+      href="/tags/hugo/"
+      title="All posts tagged with 'hugo'"
+    >
+      hugo
+    </a>
+  </span>
+
+        </span>
+      
+    
+    
+  
+    
+    
+    
+  
+    
+    
+    
+  
+
+
+
+
+
+
+        </div>
+      </footer>
+    </article>
+  
+    <article class="gblog-post">
+      <header class="gblog-post__header">
+        <h1 class="gblog-post__title">
+          <a href="/posts/basicinterface/">基础接口脚本</a>
+        </h1>
+      </header>
+
+      <section class="gblog-markdown">
+        <div class="flex align-center gblog-post__anchorwrap">
+    <h1 id="基础接口脚本"
+    >
+        基础接口脚本
+    </h1>
+    <a data-clipboard-text="http://localhost:1313/posts/basicinterface/#基础接口脚本" class="gblog-post__anchor clip flex align-center" aria-label="Anchor 基础接口脚本" href="#%e5%9f%ba%e7%a1%80%e6%8e%a5%e5%8f%a3%e8%84%9a%e6%9c%ac">
+        <svg class="gblog-icon gblog_link"><use xlink:href="#gblog_link"></use></svg>
+    </a>
+</div>
+<p>主要的功能是读写mysql数据库，读取ELK和Wazuh，发送邮件，后续会增加更多功能，至于import的库，可以自行使用pip下载</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> requests <span style="color:#f92672">import</span> urllib3
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> requests.auth <span style="color:#f92672">import</span> HTTPBasicAuth
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> json<span style="color:#f92672">,</span> requests<span style="color:#f92672">,</span> mysql.connector<span style="color:#f92672">,</span> re<span style="color:#f92672">,</span> os<span style="color:#f92672">,</span>smtplib
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> email.mime.multipart <span style="color:#f92672">import</span> MIMEMultipart
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> email.mime.text <span style="color:#f92672">import</span> MIMETextfrom base64
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> b64encode
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">executeMysqlData</span>(serverID, oper<span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>,dataSQL<span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> serverID <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>:
+</span></span><span style="display:flex;"><span>        mydb <span style="color:#f92672">=</span> mysql<span style="color:#f92672">.</span>onnector<span style="color:#f92672">.</span>connect(
+</span></span><span style="display:flex;"><span>            host<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;x.x.x.x&#34;</span>,
+</span></span><span style="display:flex;"><span>            user<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;x.x.x.x&#34;</span>,
+</span></span><span style="display:flex;"><span>            password<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;x.x.x.x&#34;</span>,
+</span></span><span style="display:flex;"><span>            database<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;x.x.x.x&#34;</span>,
+</span></span><span style="display:flex;"><span>            port<span style="color:#f92672">=</span><span style="color:#ae81ff">3306</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">elif</span> serverID <span style="color:#f92672">==</span> <span style="color:#ae81ff">2</span> :
+</span></span><span style="display:flex;"><span>        mydb <span style="color:#f92672">=</span> mysql<span style="color:#f92672">.</span>connector<span style="color:#f92672">.</span>connect(
+</span></span><span style="display:flex;"><span>            host<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;y.y.y.y&#34;</span>,
+</span></span><span style="display:flex;"><span>            user<span style="color:#f92672">=</span><span style="color:#e6db74">&#34; yyyy&#34;</span>,
+</span></span><span style="display:flex;"><span>            password<span style="color:#f92672">=</span><span style="color:#e6db74">&#34; yyyy&#34;</span>,
+</span></span><span style="display:flex;"><span>            database<span style="color:#f92672">=</span><span style="color:#e6db74">&#34; yyyy&#34;</span>,
+</span></span><span style="display:flex;"><span>            port<span style="color:#f92672">=</span><span style="color:#ae81ff">3306</span>)
+</span></span><span style="display:flex;"><span>    mycursor <span style="color:#f92672">=</span> mydb<span style="color:#f92672">.</span> cursor()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> oper<span style="color:#f92672">.</span>upper() <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;WRITE&#39;</span> <span style="color:#f92672">and</span> dataSQL<span style="color:#f92672">.</span>split()[θ]<span style="color:#f92672">.</span>upper() <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#39;SELECT&#39;</span>:
+</span></span><span style="display:flex;"><span>        mycursor<span style="color:#f92672">.</span>execute(dataSQL)
+</span></span><span style="display:flex;"><span>        mydb<span style="color:#f92672">.</span>commit()
+</span></span><span style="display:flex;"><span>        mycursor<span style="color:#f92672">.</span>close()
+</span></span><span style="display:flex;"><span>        mydb<span style="color:#f92672">.</span>close()
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> mycursor<span style="color:#f92672">.</span>rowcount <span style="color:#f92672">&gt;</span> θ:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">True</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">False</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">elif</span> oper<span style="color:#f92672">.</span>upper() <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;READ&#39;</span> <span style="color:#f92672">and</span> dataSQL<span style="color:#f92672">.</span>split()[<span style="color:#ae81ff">0</span>]<span style="color:#f92672">.</span>upper() <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#39;INSERT&#39;</span> <span style="color:#f92672">and</span> dataSQL<span style="color:#f92672">.</span>split()[θ]<span style="color:#f92672">.</span>upper() <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#39;UPDATE&#39;</span>:
+</span></span><span style="display:flex;"><span>        mycursor<span style="color:#f92672">.</span> execute(dataSQL)
+</span></span><span style="display:flex;"><span>        resultList <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> mycursor:
+</span></span><span style="display:flex;"><span>            resultList<span style="color:#f92672">.</span> append(i)
+</span></span><span style="display:flex;"><span>        mycursor<span style="color:#f92672">.</span>close()
+</span></span><span style="display:flex;"><span>        mydb<span style="color:#f92672">.</span>close()
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> resultList
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39; unexpected request! check and try again!&#39;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">#定义 mcafee查询 ip和机器名信息，允许传递 ip地址或者机器名或者FQDN名，返回为 json数据</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">apiFromMcafee</span>(actionId<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>, input<span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>):
+</span></span><span style="display:flex;"><span>            urllib3<span style="color:#f92672">.</span>disable<span style="color:#f92672">.</span>warnings()
+</span></span><span style="display:flex;"><span>            username <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;xxx&#39;</span>
+</span></span><span style="display:flex;"><span>            password <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;yyy&#39;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> actionId <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>:
+</span></span><span style="display:flex;"><span>                url<span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;https://xxxx:8443/remote/system.find?searchText=</span><span style="color:#e6db74">{</span>input<span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;:output=json&#39;</span>
+</span></span><span style="display:flex;"><span>                curl_command<span style="color:#f92672">=</span><span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;curl -u</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#39;&#34;&#39;</span><span style="color:#f92672">+</span>username<span style="color:#f92672">+</span><span style="color:#e6db74">&#39;&#34;&#39;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#39;&#34;&#39;</span><span style="color:#f92672">+</span>password<span style="color:#f92672">+</span><span style="color:#e6db74">&#39;&#34;&#39;</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> -s -k &#34;</span><span style="color:#e6db74">{</span>url<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;&#39;</span>
+</span></span><span style="display:flex;"><span>                data <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>popen(curl_command)<span style="color:#f92672">.</span>read()
+</span></span><span style="display:flex;"><span>                patternIP <span style="color:#f92672">=</span> re<span style="color:#f92672">.</span>compile(<span style="color:#e6db74">r</span><span style="color:#e6db74">&#39;10.((25[θ-5]|2[0-4]\d|1\d</span><span style="color:#e6db74">{2}</span><span style="color:#e6db74">|[1-9]?\d)\.)</span><span style="color:#e6db74">{2}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>                record<span style="color:#f92672">=</span>{}
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> bool(re<span style="color:#f92672">.</span> <span style="color:#66d9ef">match</span>(patternIP, input)) <span style="color:#f92672">==</span> <span style="color:#66d9ef">True</span>:
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> len(data) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">20</span>:
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">if</span> data[θ:<span style="color:#ae81ff">2</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;OK&#39;</span>:
+</span></span><span style="display:flex;"><span>                            jsonStr <span style="color:#f92672">=</span> json<span style="color:#f92672">.</span> loads(data[<span style="color:#ae81ff">5</span>:])
+</span></span><span style="display:flex;"><span>                            <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">0</span>, len(jsonStr)):
+</span></span><span style="display:flex;"><span>                                ip <span style="color:#f92672">=</span> jsonStr[i][<span style="color:#e6db74">&#39;EPOComputerProperties. IPAddress&#39;</span>]
+</span></span><span style="display:flex;"><span>                                subnetSearch <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> patternIP<span style="color:#f92672">.</span> search(ip)[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;0/24&#39;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span>
+</span></span><span style="display:flex;"><span>                                querySubnetInfo <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;SELECT name from IPStatus WHERE subnet = </span><span style="color:#e6db74">{</span>subnetSearch<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> 
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">if</span> input <span style="color:#f92672">==</span> ip:
+</span></span><span style="display:flex;"><span>                                    <span style="color:#75715e">#这些只是为了看着好看，所以未知的统一改成 Unknown</span>
+</span></span><span style="display:flex;"><span>                                    <span style="color:#66d9ef">if</span> jsonStr[i][<span style="color:#e6db74">&#39;EPOComputerProperties. UserName&#39;</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;N/A&#39;</span> <span style="color:#f92672">or</span> jsonStr[i][<span style="color:#e6db74">&#39;EPOComputerProperties.Username&#39;</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;None&#39;</span>:
+</span></span><span style="display:flex;"><span>                                        user <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39; Unknown&#39;</span>
+</span></span><span style="display:flex;"><span>                                    <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                                        user <span style="color:#f92672">=</span> jsonStr[i][<span style="color:#e6db74">&#39;EPOComputerProperties.UserName&#39;</span>]
+</span></span><span style="display:flex;"><span>                                    <span style="color:#66d9ef">if</span> jsonStr[i][<span style="color:#e6db74">&#39;EPOComputerProperties. IPHostName&#39;</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;N/A&#39;</span> <span style="color:#f92672">or</span> jsonStr[i][<span style="color:#e6db74">&#39;EPOComputerProperties.IPHostName&#39;</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;None&#39;</span>:
+</span></span><span style="display:flex;"><span>                                        hostname <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39; Unknown&#39;</span>
+</span></span><span style="display:flex;"><span>                                    <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                                        hostname <span style="color:#f92672">=</span> jsonStr[i][<span style="color:#e6db74">&#39;EPOComputerProperties.IPHostName&#39;</span>]
+</span></span><span style="display:flex;"><span>                                    queryDepartment <span style="color:#f92672">=</span> executeMysqlData(<span style="color:#ae81ff">1</span>,<span style="color:#e6db74">&#39;read&#39;</span>,querySubnetInfo)
+</span></span><span style="display:flex;"><span>                                    <span style="color:#66d9ef">if</span> len(queryDepartment)<span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>:
+</span></span><span style="display:flex;"><span>                                        departmentName <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Unknown&#39;</span>
+</span></span><span style="display:flex;"><span>                                    <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                                        departmentName <span style="color:#f92672">=</span> queryDepartment[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>                                    record <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>                                        <span style="color:#e6db74">&#39;ip&#39;</span>:ip,
+</span></span><span style="display:flex;"><span>                                        <span style="color:#e6db74">&#39;username&#39;</span>:user,
+</span></span><span style="display:flex;"><span>                                        <span style="color:#e6db74">&#39;department&#39;</span>:departmentName,
+</span></span><span style="display:flex;"><span>                                        <span style="color:#e6db74">&#39;computerName&#39;</span>:hostname
+</span></span><span style="display:flex;"><span>                                        }
+</span></span><span style="display:flex;"><span>                                    <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                                    record <span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                            record <span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                    record <span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">elif</span> actionId <span style="color:#f92672">==</span> <span style="color:#ae81ff">2</span>:
+</span></span><span style="display:flex;"><span>                url <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;https://xxxx:8443/remote/core.executeQuery?queryId=</span><span style="color:#e6db74">{</span>input<span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;:output=json&#39;</span>
+</span></span><span style="display:flex;"><span>                curl_command <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;curl -u </span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#39;&#34;&#39;</span> <span style="color:#f92672">+</span> username <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;&#34;&#39;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#39;&#34;&#39;</span> <span style="color:#f92672">+</span> password <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;&#34;&#39;</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> -s -k&#34;</span><span style="color:#e6db74">{</span>url<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;&#39;</span>
+</span></span><span style="display:flex;"><span>                response <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>popen(curl_command)<span style="color:#f92672">.</span>read()
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> response
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">#定义发送邮件接口的方法, subject为标题, data为内容, sendTo为收件人, type为邮件类型, 默认为 html, 如乘是纯文本, 则写 plain</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">sendMail</span>(subject, data,sendTo<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;xxxx@xxxx.xxx&#39;</span>,type<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;html&#39;</span>):
+</span></span><span style="display:flex;"><span>            msg <span style="color:#f92672">=</span> MIMEMultipart(<span style="color:#e6db74">&#39;alternative&#39;</span>)
+</span></span><span style="display:flex;"><span>            msg[<span style="color:#e6db74">&#39;Subject&#39;</span>] <span style="color:#f92672">=</span> subject
+</span></span><span style="display:flex;"><span>            msg[<span style="color:#e6db74">&#39;From&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;xxxx@xxxx.xxx&#39;</span>
+</span></span><span style="display:flex;"><span>            msg[<span style="color:#e6db74">&#39;To&#39;</span>] <span style="color:#f92672">=</span> sendTo
+</span></span><span style="display:flex;"><span>            text_part <span style="color:#f92672">=</span> MIMEText(data, type)
+</span></span><span style="display:flex;"><span>            msg<span style="color:#f92672">.</span>attach(text_part)
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">#此处填写邮件服务器接口</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">with</span> smtplib<span style="color:#f92672">.</span>SMTP(<span style="color:#e6db74">&#39;xxxx&#39;</span>,<span style="color:#ae81ff">25</span>) <span style="color:#66d9ef">as</span> smtp:
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>                    smtp<span style="color:#f92672">.</span>send_message(msg)
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">True</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">except</span>:
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">False</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">#定义读取ELK的方法, serverId为区分不同的ELK集群,indexData为要搜索的索引目录, bodyData为要搜索的条件, 格式为json,返回json格式的字符串</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">readELK</span>(serverId<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>,indexDatα<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>,bodyDatα<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>,esVersion<span style="color:#f92672">=</span><span style="color:#ae81ff">8</span>):
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">#xxxx</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> serverId <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>:
+</span></span><span style="display:flex;"><span>                apiKey <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;aaaa&#39;</span>
+</span></span><span style="display:flex;"><span>                url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;  https://ssss:9200&#39;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">#wazuh的ELK</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">elif</span> serverId <span style="color:#f92672">==</span> <span style="color:#ae81ff">3</span>:
+</span></span><span style="display:flex;"><span>                username <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;wazuh&#39;</span>
+</span></span><span style="display:flex;"><span>                password <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;wazuh&#39;</span>
+</span></span><span style="display:flex;"><span>                url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;https://aaaa:9200&#39;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> esVersion <span style="color:#f92672">==</span> <span style="color:#ae81ff">8</span>:
+</span></span><span style="display:flex;"><span>                headers <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34; Authorization&#34;</span>: <span style="color:#e6db74">&#34;ApiKey&#34;</span> <span style="color:#f92672">+</span> apiKey}
+</span></span><span style="display:flex;"><span>                resultJson <span style="color:#f92672">=</span> json<span style="color:#f92672">.</span>loads((requests<span style="color:#f92672">.</span> get(url <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/&#34;</span> <span style="color:#f92672">+</span> indexData <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/_search&#34;</span>, headers<span style="color:#f92672">=</span> headers, json<span style="color:#f92672">=</span>bodyData,verify<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>))<span style="color:#f92672">.</span>text)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">elif</span> esVersion <span style="color:#f92672">==</span> <span style="color:#ae81ff">7</span>:
+</span></span><span style="display:flex;"><span>                resultJson <span style="color:#f92672">=</span> json<span style="color:#f92672">.</span>loads((requests<span style="color:#f92672">.</span> get(url <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/&#34;</span> <span style="color:#f92672">+</span> indexData <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/_search&#34;</span>, auth<span style="color:#f92672">=</span>HTTPBasicAuth(username,password),json<span style="color:#f92672">=</span>bodyData,verify<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>))<span style="color:#f92672">.</span>text)
+</span></span><span style="display:flex;"><span>            print (<span style="color:#e6db74">&#34;读取ELK数据完毕&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> resultJson
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">#定义读写jira的api的方法，第一个为url,也就是条件,第二个为jsonPost,如果要创建case则使用jsonPost,如果只是get的话第二项则不用写</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">apiFromJira</span>(url,jsonPost<span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>):
+</span></span><span style="display:flex;"><span>            usernameForJira <span style="color:#f92672">=</span> passwordForJira <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;xxxx&#39;</span>
+</span></span><span style="display:flex;"><span>            urllib3<span style="color:#f92672">.</span> disable _ warnings()
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> jsonPost <span style="color:#f92672">is</span> <span style="color:#66d9ef">None</span>:
+</span></span><span style="display:flex;"><span>                response <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span> get(url, verify<span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>, auth<span style="color:#f92672">=</span>(usernameForJira, passwordForJira))
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> url[<span style="color:#f92672">-</span><span style="color:#ae81ff">8</span>:] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;assignee&#39;</span>:
+</span></span><span style="display:flex;"><span>                    response <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>put(url,json<span style="color:#f92672">=</span>jsonPost,verify<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>,auth<span style="color:#f92672">=</span>(usernameForJira, passwordForJira))
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                    response <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>post(url,json<span style="color:#f92672">=</span>jsonPost,verify<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>,auth<span style="color:#f92672">=</span>(usernameForJira, passwordForJira))
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> response<span style="color:#f92672">.</span> text
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">getClientFromWazuh</span>(option<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>, params<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;limit=10000&#39;</span>, action<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;get&#39;</span>,urlParameters<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;&#39;</span>):
+</span></span><span style="display:flex;"><span>            urllib3<span style="color:#f92672">.</span> disable _ warnings()
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">#默认用户名和密码</span>
+</span></span><span style="display:flex;"><span>            username <span style="color:#f92672">=</span> password <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;xxxx&#39;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> option <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>:
+</span></span><span style="display:flex;"><span>                host <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;xxxx&#39;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">elif</span> option <span style="color:#f92672">==</span> <span style="color:#ae81ff">2</span>:
+</span></span><span style="display:flex;"><span>                host<span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;wazuh.bstops.com&#39;</span>
+</span></span><span style="display:flex;"><span>                username <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;xxxx&#39;</span>
+</span></span><span style="display:flex;"><span>                password <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;xxxx&#39;</span>
+</span></span><span style="display:flex;"><span>            host <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;10.190.18.8&#39;</span>
+</span></span><span style="display:flex;"><span>            protocol <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;https&#39;</span>
+</span></span><span style="display:flex;"><span>            port <span style="color:#f92672">=</span> <span style="color:#ae81ff">55000</span>
+</span></span><span style="display:flex;"><span>            login_endpoint <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;security/user/authenticate&#39;</span>
+</span></span><span style="display:flex;"><span>            login_url <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>protocol<span style="color:#e6db74">}</span><span style="color:#e6db74">://</span><span style="color:#e6db74">{</span>host<span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">{</span>port<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">{</span>login_endpoint<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>            basic_auth <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>username<span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">{</span>password<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span><span style="color:#f92672">.</span>encode()
+</span></span><span style="display:flex;"><span>            login_headers <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#39;Content-Type&#39;</span>: <span style="color:#e6db74">&#39;application/json&#39;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#39;Authorization&#39;</span>: <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;Basic</span><span style="color:#e6db74">{</span>b64encode(basic_auth)<span style="color:#f92672">.</span>decode()<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            response <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>post(login_url, headers <span style="color:#f92672">=</span> login_headers, verify<span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> response<span style="color:#f92672">.</span>status_code <span style="color:#f92672">==</span> <span style="color:#ae81ff">405</span>:
+</span></span><span style="display:flex;"><span>                response <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>get(login_url, headers <span style="color:#f92672">=</span> login_headers, verify<span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>)
+</span></span><span style="display:flex;"><span>            token <span style="color:#f92672">=</span> json<span style="color:#f92672">.</span>loads(response<span style="color:#f92672">.</span>content<span style="color:#f92672">.</span>decode())[<span style="color:#e6db74">&#39;data&#39;</span>][<span style="color:#e6db74">&#39;token&#39;</span>]
+</span></span><span style="display:flex;"><span>            requests_headers <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#39;Content-Type&#39;</span>: <span style="color:#e6db74">&#39;application/json&#39;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#39;Authorization&#39;</span>: <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;Bearer</span><span style="color:#e6db74">{</span>token<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> action <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;get&#39;</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> urlParameters <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;&#39;</span> <span style="color:#f92672">or</span> <span style="color:#e6db74">&#39;agents/&#39;</span> <span style="color:#f92672">in</span> urlParameters:
+</span></span><span style="display:flex;"><span>                    response <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>get(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>protocol<span style="color:#e6db74">}</span><span style="color:#e6db74">://</span><span style="color:#e6db74">{</span>host<span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">{</span>port<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">{</span>urlParameters<span style="color:#e6db74">}</span><span style="color:#e6db74">?</span><span style="color:#e6db74">{</span>params<span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;pretty=true&#34;</span>,headers <span style="color:#f92672">=</span> requests_headers, verify<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                    response <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>get(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>protocol<span style="color:#e6db74">}</span><span style="color:#e6db74">://</span><span style="color:#e6db74">{</span>host<span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">{</span>port<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">{</span>urlParameters<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>, headers <span style="color:#f92672">=</span> requests_headers,verify <span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>,params <span style="color:#f92672">=</span> params)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> response<span style="color:#f92672">.</span>text
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">elif</span> action <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;put&#39;</span>:
+</span></span><span style="display:flex;"><span>                response <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>put(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>protocol<span style="color:#e6db74">}</span><span style="color:#e6db74">://</span><span style="color:#e6db74">{</span>host<span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">{</span>port<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">{</span>urlParameters<span style="color:#e6db74">}</span><span style="color:#e6db74">?agents_list=2310429&amp;pretty=true&amp;wait_for_complete=true&#34;</span>,headers <span style="color:#f92672">=</span> requests_headers,verify <span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span> , params <span style="color:#f92672">=</span> params)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> response<span style="color:#f92672">.</span>text
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">elif</span> action <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;post&#39;</span>:
+</span></span><span style="display:flex;"><span>                response <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>post(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>protocol<span style="color:#e6db74">}</span><span style="color:#e6db74">://</span><span style="color:#e6db74">{</span>host<span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">{</span>port<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">{</span>urlParameters<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>, headers<span style="color:#f92672">=</span> requests_headers, verify <span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span> , params <span style="color:#f92672">=</span> params)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> response<span style="color:#f92672">.</span>text
+</span></span></code></pre></div>
+      </section>
+      <div class="gblog-post__readmore">
+        
+      </div>
+
+      <footer class="gblog-post__footer">
+        <div class="flex flex-wrap align-center gblog-post__meta">
+          <span class="flex align-center no-wrap gblog-post__meta--update">
+  <svg class="gblog-icon gblog_date"><use xlink:href="#gblog_date"></use></svg>
+  <span class="gblog-post__tag">
+    <time datetime="0001-01-01T00:00:00Z">
+      
+      Jan 1, 0001
+    </time>
+  </span>
+</span>
+
+<span class="flex align-center no-wrap gblog-post__meta--readtime">
+  <svg class="gblog-icon gblog_timer"><use xlink:href="#gblog_timer"></use></svg>
+  <span class="gblog-post__tag">3 min read</span>
+</span>
+
+
+
+
+
+
+
+
+  
+    
+    
+      
+        <span class="flex align-center no-wrap gblog-post__meta--tag">
+          <svg class="gblog-icon gblog_bookmark"><use xlink:href="#gblog_bookmark"></use></svg>
+          
+  <span class="gblog-post__tag gblog-button gblog-button--regular">
+    <a
+      class="gblog-button__link"
+      href="/tags/python/"
+      title="All posts tagged with 'Python'"
+    >
+      Python
+    </a>
+  </span>
+
+        </span>
+      
+    
+    
+  
+    
+    
+    
+  
 
 
 

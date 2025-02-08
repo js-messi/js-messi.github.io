@@ -12,8 +12,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="generator" content="Hugo 0.143.1">
   <meta name="robots" content="index, follow" />
+  <meta name="description" content=" 基于Python3写的基础接口脚本，办公用 主要的功能是读写mysql数据库，读取ELK和Wazuh，发送邮件，后续会增加更多功能，至于import的库，可以自行使用pip下载
+from requests import urllib3 from requests.auth import HTTPBasicAuth import json, requests, mysql.connector, re, os,smtplib from email.mime.multipart import MIMEMultipart from email.mime.text import MIMETextfrom base64 import b64encode def executeMysqlData(serverID, oper= None,dataSQL= None): if serverID == 1: mydb = mysql.onnector.connect( host=&#34;x.x.x.x&#34;, user=&#34;x.x.x.x&#34;, password=&#34;x.x.x.x&#34;, database=&#34;x.x.x.x&#34;, port=3306) elif serverID == 2 : mydb = mysql.connector.connect( host=&#34;y.y.y.y&#34;, user=&#34; yyyy&#34;, password=&#34; yyyy&#34;, database=&#34; yyyy&#34;, port=3306) mycursor = mydb. cursor() if oper.upper() == &#39;WRITE&#39; and dataSQL.split()[θ].upper() != &#39;SELECT&#39;: mycursor.execute(dataSQL) mydb.commit() mycursor.close() mydb.close() if mycursor.rowcount &gt; θ: return True else: return False elif oper.upper() == &#39;READ&#39; and dataSQL.split()[0].upper() != &#39;INSERT&#39; and dataSQL.split()[θ].upper() != &#39;UPDATE&#39;: mycursor. execute(dataSQL) resultList = [] for i in mycursor: resultList. append(i) mycursor.close() mydb.close() return resultList else: return &#39; unexpected request! check and try again!&#39; #定义 mcafee查询 ip和机器名信息，允许传递 ip地址或者机器名或者FQDN名，返回为 json数据 def apiFromMcafee(actionId=1, input= None): urllib3.disable.warnings() username = &#39;xxx&#39; password = &#39;yyy&#39; if actionId == 1: url= f&#39;https://xxxx:8443/remote/system.find?searchText={input}&amp;:output=json&#39; curl_command=f&#39;curl -u{&#39;&#34;&#39;&#43;username&#43;&#39;&#34;&#39;}:{&#39;&#34;&#39;&#43;password&#43;&#39;&#34;&#39;} -s -k &#34;{url}&#34;&#39; data = os.popen(curl_command).read() patternIP = re.compile(r&#39;10.((25[θ-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){2}&#39;) record={} if bool(re. match(patternIP, input)) == True: if len(data) &gt; 20: if data[θ:2] == &#39;OK&#39;: jsonStr = json. loads(data[5:]) for i in range(0, len(jsonStr)): ip = jsonStr[i][&#39;EPOComputerProperties. IPAddress&#39;] subnetSearch = &#34;&#39;&#34; &#43; patternIP. search(ip)[0] &#43; &#39;0/24&#39; &#43; &#34;&#39;&#34; querySubnetInfo = f&#34;SELECT name from IPStatus WHERE subnet = {subnetSearch}&#34; if input == ip: #这些只是为了看着好看，所以未知的统一改成 Unknown if jsonStr[i][&#39;EPOComputerProperties. UserName&#39;] == &#39;N/A&#39; or jsonStr[i][&#39;EPOComputerProperties.Username&#39;] == &#39;None&#39;: user = &#39; Unknown&#39; else: user = jsonStr[i][&#39;EPOComputerProperties.UserName&#39;] if jsonStr[i][&#39;EPOComputerProperties. IPHostName&#39;] == &#39;N/A&#39; or jsonStr[i][&#39;EPOComputerProperties.IPHostName&#39;] == &#39;None&#39;: hostname = &#39; Unknown&#39; else: hostname = jsonStr[i][&#39;EPOComputerProperties.IPHostName&#39;] queryDepartment = executeMysqlData(1,&#39;read&#39;,querySubnetInfo) if len(queryDepartment)== 0: departmentName = &#39;Unknown&#39; else: departmentName = queryDepartment[0][0] record = { &#39;ip&#39;:ip, &#39;username&#39;:user, &#39;department&#39;:departmentName, &#39;computerName&#39;:hostname } break else: record = False else: record = False else: record = False elif actionId == 2: url = f&#39;https://xxxx:8443/remote/core.executeQuery?queryId={input}&amp;:output=json&#39; curl_command = f&#39;curl -u {&#39;&#34;&#39; &#43; username &#43; &#39;&#34;&#39;}:{&#39;&#34;&#39; &#43; password &#43; &#39;&#34;&#39;} -s -k&#34;{url}&#34;&#39; response = os.popen(curl_command).read() return response #定义发送邮件接口的方法, subject为标题, data为内容, sendTo为收件人, type为邮件类型, 默认为 html, 如乘是纯文本, 则写 plain def sendMail(subject, data,sendTo=&#39;xxxx@xxxx.xxx&#39;,type=&#39;html&#39;): msg = MIMEMultipart(&#39;alternative&#39;) msg[&#39;Subject&#39;] = subject msg[&#39;From&#39;] = &#39;xxxx@xxxx.xxx&#39; msg[&#39;To&#39;] = sendTo text_part = MIMEText(data, type) msg.attach(text_part) #此处填写邮件服务器接口 with smtplib.SMTP(&#39;xxxx&#39;,25) as smtp: try: smtp.send_message(msg) return True except: return False #定义读取ELK的方法, serverId为区分不同的ELK集群,indexData为要搜索的索引目录, bodyData为要搜索的条件, 格式为json,返回json格式的字符串 def readELK(serverId=2,indexDatα=None,bodyDatα=None,esVersion=8): #xxxx if serverId == 1: apiKey = &#39;aaaa&#39; url = &#39; https://ssss:9200&#39; #wazuh的ELK elif serverId == 3: username = &#39;wazuh&#39; password = &#39;wazuh&#39; url = &#39;https://aaaa:9200&#39; if esVersion == 8: headers = {&#34; Authorization&#34;: &#34;ApiKey&#34; &#43; apiKey} resultJson = json.loads((requests. get(url &#43; &#34;/&#34; &#43; indexData &#43; &#34;/_search&#34;, headers= headers, json=bodyData,verify=False)).text) elif esVersion == 7: resultJson = json.loads((requests. get(url &#43; &#34;/&#34; &#43; indexData &#43; &#34;/_search&#34;, auth=HTTPBasicAuth(username,password),json=bodyData,verify=False)).text) print (&#34;读取ELK数据完毕&#34;) return resultJson #定义读写jira的api的方法，第一个为url,也就是条件,第二个为jsonPost,如果要创建case则使用jsonPost,如果只是get的话第二项则不用写 def apiFromJira(url,jsonPost= None): usernameForJira = passwordForJira = &#39;xxxx&#39; urllib3. disable _ warnings() if jsonPost is None: response = requests. get(url, verify= False, auth=(usernameForJira, passwordForJira)) else: if url[-8:] == &#39;assignee&#39;: response = requests.put(url,json=jsonPost,verify=False,auth=(usernameForJira, passwordForJira)) else: response = requests.post(url,json=jsonPost,verify=False,auth=(usernameForJira, passwordForJira)) return response. text def getClientFromWazuh(option=1, params=&#39;limit=10000&#39;, action=&#39;get&#39;,urlParameters=&#39;&#39;): urllib3. disable _ warnings() #默认用户名和密码 username = password = &#39;xxxx&#39; if option == 1: host = &#39;xxxx&#39; elif option == 2: host= &#39;wazuh.bstops.com&#39; username = &#39;xxxx&#39; password = &#39;xxxx&#39; host = &#39;10.190.18.8&#39; protocol = &#39;https&#39; port = 55000 login_endpoint = &#39;security/user/authenticate&#39; login_url = f&#34;{protocol}://{host}:{port}/{login_endpoint}&#34; basic_auth = f&#34;{username}:{password}&#34;.encode() login_headers = { &#39;Content-Type&#39;: &#39;application/json&#39;, &#39;Authorization&#39;: f&#39;Basic{b64encode(basic_auth).decode()}&#39; } response = requests.post(login_url, headers = login_headers, verify= False) if response.status_code == 405: response = requests.get(login_url, headers = login_headers, verify= False) token = json.loads(response.content.decode())[&#39;data&#39;][&#39;token&#39;] requests_headers = { &#39;Content-Type&#39;: &#39;application/json&#39;, &#39;Authorization&#39;: f&#39;Bearer{token}&#39; } if action == &#39;get&#39;: if urlParameters == &#39;&#39; or &#39;agents/&#39; in urlParameters: response = requests.get(f&#34;{protocol}://{host}:{port}/{urlParameters}?{params}&amp;pretty=true&#34;,headers = requests_headers, verify=False) else: response = requests.get(f&#34;{protocol}://{host}:{port}/{urlParameters}&#34;, headers = requests_headers,verify = False,params = params) return response.text elif action == &#39;put&#39;: response = requests.put(f&#34;{protocol}://{host}:{port}/{urlParameters}?agents_list=2310429&amp;pretty=true&amp;wait_for_complete=true&#34;,headers = requests_headers,verify = False , params = params) return response.text elif action == &#39;post&#39;: response = requests.post(f&#34;{protocol}://{host}:{port}/{urlParameters}&#34;, headers= requests_headers, verify = False , params = params) return response.text " />
 
-    <title>MyTreeHoles</title>
+    <title>基础接口脚本 | MyTreeHoles</title>
 
     <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg" />
 <link
@@ -32,25 +34,67 @@
     
 
     
+  <meta
+    property="og:title"
+    content="基础接口脚本"
+  />
   <meta property="og:site_name" content="MyTreeHoles" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="http://localhost:1313/" />
+  <meta property="og:description" content=" 基于Python3写的基础接口脚本，办公用 主要的功能是读写mysql数据库，读取ELK和Wazuh，发送邮件，后续会增加更多功能，至于import的库，可以自行使用pip下载
+from requests import urllib3 from requests.auth import HTTPBasicAuth import json, requests, mysql.connector, re, os,smtplib from email.mime.multipart import MIMEMultipart from email.mime.text import MIMETextfrom base64 import b64encode def executeMysqlData(serverID, oper= None,dataSQL= None): if serverID == 1: mydb = mysql.onnector.connect( host=&#34;x.x.x.x&#34;, user=&#34;x.x.x.x&#34;, password=&#34;x.x.x.x&#34;, database=&#34;x.x.x.x&#34;, port=3306) elif serverID == 2 : mydb = mysql.connector.connect( host=&#34;y.y.y.y&#34;, user=&#34; yyyy&#34;, password=&#34; yyyy&#34;, database=&#34; yyyy&#34;, port=3306) mycursor = mydb. cursor() if oper.upper() == &#39;WRITE&#39; and dataSQL.split()[θ].upper() != &#39;SELECT&#39;: mycursor.execute(dataSQL) mydb.commit() mycursor.close() mydb.close() if mycursor.rowcount &gt; θ: return True else: return False elif oper.upper() == &#39;READ&#39; and dataSQL.split()[0].upper() != &#39;INSERT&#39; and dataSQL.split()[θ].upper() != &#39;UPDATE&#39;: mycursor. execute(dataSQL) resultList = [] for i in mycursor: resultList. append(i) mycursor.close() mydb.close() return resultList else: return &#39; unexpected request! check and try again!&#39; #定义 mcafee查询 ip和机器名信息，允许传递 ip地址或者机器名或者FQDN名，返回为 json数据 def apiFromMcafee(actionId=1, input= None): urllib3.disable.warnings() username = &#39;xxx&#39; password = &#39;yyy&#39; if actionId == 1: url= f&#39;https://xxxx:8443/remote/system.find?searchText={input}&amp;:output=json&#39; curl_command=f&#39;curl -u{&#39;&#34;&#39;&#43;username&#43;&#39;&#34;&#39;}:{&#39;&#34;&#39;&#43;password&#43;&#39;&#34;&#39;} -s -k &#34;{url}&#34;&#39; data = os.popen(curl_command).read() patternIP = re.compile(r&#39;10.((25[θ-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){2}&#39;) record={} if bool(re. match(patternIP, input)) == True: if len(data) &gt; 20: if data[θ:2] == &#39;OK&#39;: jsonStr = json. loads(data[5:]) for i in range(0, len(jsonStr)): ip = jsonStr[i][&#39;EPOComputerProperties. IPAddress&#39;] subnetSearch = &#34;&#39;&#34; &#43; patternIP. search(ip)[0] &#43; &#39;0/24&#39; &#43; &#34;&#39;&#34; querySubnetInfo = f&#34;SELECT name from IPStatus WHERE subnet = {subnetSearch}&#34; if input == ip: #这些只是为了看着好看，所以未知的统一改成 Unknown if jsonStr[i][&#39;EPOComputerProperties. UserName&#39;] == &#39;N/A&#39; or jsonStr[i][&#39;EPOComputerProperties.Username&#39;] == &#39;None&#39;: user = &#39; Unknown&#39; else: user = jsonStr[i][&#39;EPOComputerProperties.UserName&#39;] if jsonStr[i][&#39;EPOComputerProperties. IPHostName&#39;] == &#39;N/A&#39; or jsonStr[i][&#39;EPOComputerProperties.IPHostName&#39;] == &#39;None&#39;: hostname = &#39; Unknown&#39; else: hostname = jsonStr[i][&#39;EPOComputerProperties.IPHostName&#39;] queryDepartment = executeMysqlData(1,&#39;read&#39;,querySubnetInfo) if len(queryDepartment)== 0: departmentName = &#39;Unknown&#39; else: departmentName = queryDepartment[0][0] record = { &#39;ip&#39;:ip, &#39;username&#39;:user, &#39;department&#39;:departmentName, &#39;computerName&#39;:hostname } break else: record = False else: record = False else: record = False elif actionId == 2: url = f&#39;https://xxxx:8443/remote/core.executeQuery?queryId={input}&amp;:output=json&#39; curl_command = f&#39;curl -u {&#39;&#34;&#39; &#43; username &#43; &#39;&#34;&#39;}:{&#39;&#34;&#39; &#43; password &#43; &#39;&#34;&#39;} -s -k&#34;{url}&#34;&#39; response = os.popen(curl_command).read() return response #定义发送邮件接口的方法, subject为标题, data为内容, sendTo为收件人, type为邮件类型, 默认为 html, 如乘是纯文本, 则写 plain def sendMail(subject, data,sendTo=&#39;xxxx@xxxx.xxx&#39;,type=&#39;html&#39;): msg = MIMEMultipart(&#39;alternative&#39;) msg[&#39;Subject&#39;] = subject msg[&#39;From&#39;] = &#39;xxxx@xxxx.xxx&#39; msg[&#39;To&#39;] = sendTo text_part = MIMEText(data, type) msg.attach(text_part) #此处填写邮件服务器接口 with smtplib.SMTP(&#39;xxxx&#39;,25) as smtp: try: smtp.send_message(msg) return True except: return False #定义读取ELK的方法, serverId为区分不同的ELK集群,indexData为要搜索的索引目录, bodyData为要搜索的条件, 格式为json,返回json格式的字符串 def readELK(serverId=2,indexDatα=None,bodyDatα=None,esVersion=8): #xxxx if serverId == 1: apiKey = &#39;aaaa&#39; url = &#39; https://ssss:9200&#39; #wazuh的ELK elif serverId == 3: username = &#39;wazuh&#39; password = &#39;wazuh&#39; url = &#39;https://aaaa:9200&#39; if esVersion == 8: headers = {&#34; Authorization&#34;: &#34;ApiKey&#34; &#43; apiKey} resultJson = json.loads((requests. get(url &#43; &#34;/&#34; &#43; indexData &#43; &#34;/_search&#34;, headers= headers, json=bodyData,verify=False)).text) elif esVersion == 7: resultJson = json.loads((requests. get(url &#43; &#34;/&#34; &#43; indexData &#43; &#34;/_search&#34;, auth=HTTPBasicAuth(username,password),json=bodyData,verify=False)).text) print (&#34;读取ELK数据完毕&#34;) return resultJson #定义读写jira的api的方法，第一个为url,也就是条件,第二个为jsonPost,如果要创建case则使用jsonPost,如果只是get的话第二项则不用写 def apiFromJira(url,jsonPost= None): usernameForJira = passwordForJira = &#39;xxxx&#39; urllib3. disable _ warnings() if jsonPost is None: response = requests. get(url, verify= False, auth=(usernameForJira, passwordForJira)) else: if url[-8:] == &#39;assignee&#39;: response = requests.put(url,json=jsonPost,verify=False,auth=(usernameForJira, passwordForJira)) else: response = requests.post(url,json=jsonPost,verify=False,auth=(usernameForJira, passwordForJira)) return response. text def getClientFromWazuh(option=1, params=&#39;limit=10000&#39;, action=&#39;get&#39;,urlParameters=&#39;&#39;): urllib3. disable _ warnings() #默认用户名和密码 username = password = &#39;xxxx&#39; if option == 1: host = &#39;xxxx&#39; elif option == 2: host= &#39;wazuh.bstops.com&#39; username = &#39;xxxx&#39; password = &#39;xxxx&#39; host = &#39;10.190.18.8&#39; protocol = &#39;https&#39; port = 55000 login_endpoint = &#39;security/user/authenticate&#39; login_url = f&#34;{protocol}://{host}:{port}/{login_endpoint}&#34; basic_auth = f&#34;{username}:{password}&#34;.encode() login_headers = { &#39;Content-Type&#39;: &#39;application/json&#39;, &#39;Authorization&#39;: f&#39;Basic{b64encode(basic_auth).decode()}&#39; } response = requests.post(login_url, headers = login_headers, verify= False) if response.status_code == 405: response = requests.get(login_url, headers = login_headers, verify= False) token = json.loads(response.content.decode())[&#39;data&#39;][&#39;token&#39;] requests_headers = { &#39;Content-Type&#39;: &#39;application/json&#39;, &#39;Authorization&#39;: f&#39;Bearer{token}&#39; } if action == &#39;get&#39;: if urlParameters == &#39;&#39; or &#39;agents/&#39; in urlParameters: response = requests.get(f&#34;{protocol}://{host}:{port}/{urlParameters}?{params}&amp;pretty=true&#34;,headers = requests_headers, verify=False) else: response = requests.get(f&#34;{protocol}://{host}:{port}/{urlParameters}&#34;, headers = requests_headers,verify = False,params = params) return response.text elif action == &#39;put&#39;: response = requests.put(f&#34;{protocol}://{host}:{port}/{urlParameters}?agents_list=2310429&amp;pretty=true&amp;wait_for_complete=true&#34;,headers = requests_headers,verify = False , params = params) return response.text elif action == &#39;post&#39;: response = requests.post(f&#34;{protocol}://{host}:{port}/{urlParameters}&#34;, headers= requests_headers, verify = False , params = params) return response.text " />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/posts/basicinterface/" />
 
-
+<meta property="article:section" content="Posts" />
+    <meta
+      property="article:published_time"
+      content="2025-02-08T14:00:00+08:00"
+    />
+    <meta
+      property="article:modified_time"
+      content="2025-02-08T14:00:00+08:00"
+    />
 
 
   <meta name="twitter:card" content="summary" />
-<meta name="twitter:title" content="MyTreeHoles" />
+<meta name="twitter:title" content="基础接口脚本" />
+  <meta name="twitter:description" content=" 基于Python3写的基础接口脚本，办公用 主要的功能是读写mysql数据库，读取ELK和Wazuh，发送邮件，后续会增加更多功能，至于import的库，可以自行使用pip下载
+from requests import urllib3 from requests.auth import HTTPBasicAuth import json, requests, mysql.connector, re, os,smtplib from email.mime.multipart import MIMEMultipart from email.mime.text import MIMETextfrom base64 import b64encode def executeMysqlData(serverID, oper= None,dataSQL= None): if serverID == 1: mydb = mysql.onnector.connect( host=&#34;x.x.x.x&#34;, user=&#34;x.x.x.x&#34;, password=&#34;x.x.x.x&#34;, database=&#34;x.x.x.x&#34;, port=3306) elif serverID == 2 : mydb = mysql.connector.connect( host=&#34;y.y.y.y&#34;, user=&#34; yyyy&#34;, password=&#34; yyyy&#34;, database=&#34; yyyy&#34;, port=3306) mycursor = mydb. cursor() if oper.upper() == &#39;WRITE&#39; and dataSQL.split()[θ].upper() != &#39;SELECT&#39;: mycursor.execute(dataSQL) mydb.commit() mycursor.close() mydb.close() if mycursor.rowcount &gt; θ: return True else: return False elif oper.upper() == &#39;READ&#39; and dataSQL.split()[0].upper() != &#39;INSERT&#39; and dataSQL.split()[θ].upper() != &#39;UPDATE&#39;: mycursor. execute(dataSQL) resultList = [] for i in mycursor: resultList. append(i) mycursor.close() mydb.close() return resultList else: return &#39; unexpected request! check and try again!&#39; #定义 mcafee查询 ip和机器名信息，允许传递 ip地址或者机器名或者FQDN名，返回为 json数据 def apiFromMcafee(actionId=1, input= None): urllib3.disable.warnings() username = &#39;xxx&#39; password = &#39;yyy&#39; if actionId == 1: url= f&#39;https://xxxx:8443/remote/system.find?searchText={input}&amp;:output=json&#39; curl_command=f&#39;curl -u{&#39;&#34;&#39;&#43;username&#43;&#39;&#34;&#39;}:{&#39;&#34;&#39;&#43;password&#43;&#39;&#34;&#39;} -s -k &#34;{url}&#34;&#39; data = os.popen(curl_command).read() patternIP = re.compile(r&#39;10.((25[θ-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){2}&#39;) record={} if bool(re. match(patternIP, input)) == True: if len(data) &gt; 20: if data[θ:2] == &#39;OK&#39;: jsonStr = json. loads(data[5:]) for i in range(0, len(jsonStr)): ip = jsonStr[i][&#39;EPOComputerProperties. IPAddress&#39;] subnetSearch = &#34;&#39;&#34; &#43; patternIP. search(ip)[0] &#43; &#39;0/24&#39; &#43; &#34;&#39;&#34; querySubnetInfo = f&#34;SELECT name from IPStatus WHERE subnet = {subnetSearch}&#34; if input == ip: #这些只是为了看着好看，所以未知的统一改成 Unknown if jsonStr[i][&#39;EPOComputerProperties. UserName&#39;] == &#39;N/A&#39; or jsonStr[i][&#39;EPOComputerProperties.Username&#39;] == &#39;None&#39;: user = &#39; Unknown&#39; else: user = jsonStr[i][&#39;EPOComputerProperties.UserName&#39;] if jsonStr[i][&#39;EPOComputerProperties. IPHostName&#39;] == &#39;N/A&#39; or jsonStr[i][&#39;EPOComputerProperties.IPHostName&#39;] == &#39;None&#39;: hostname = &#39; Unknown&#39; else: hostname = jsonStr[i][&#39;EPOComputerProperties.IPHostName&#39;] queryDepartment = executeMysqlData(1,&#39;read&#39;,querySubnetInfo) if len(queryDepartment)== 0: departmentName = &#39;Unknown&#39; else: departmentName = queryDepartment[0][0] record = { &#39;ip&#39;:ip, &#39;username&#39;:user, &#39;department&#39;:departmentName, &#39;computerName&#39;:hostname } break else: record = False else: record = False else: record = False elif actionId == 2: url = f&#39;https://xxxx:8443/remote/core.executeQuery?queryId={input}&amp;:output=json&#39; curl_command = f&#39;curl -u {&#39;&#34;&#39; &#43; username &#43; &#39;&#34;&#39;}:{&#39;&#34;&#39; &#43; password &#43; &#39;&#34;&#39;} -s -k&#34;{url}&#34;&#39; response = os.popen(curl_command).read() return response #定义发送邮件接口的方法, subject为标题, data为内容, sendTo为收件人, type为邮件类型, 默认为 html, 如乘是纯文本, 则写 plain def sendMail(subject, data,sendTo=&#39;xxxx@xxxx.xxx&#39;,type=&#39;html&#39;): msg = MIMEMultipart(&#39;alternative&#39;) msg[&#39;Subject&#39;] = subject msg[&#39;From&#39;] = &#39;xxxx@xxxx.xxx&#39; msg[&#39;To&#39;] = sendTo text_part = MIMEText(data, type) msg.attach(text_part) #此处填写邮件服务器接口 with smtplib.SMTP(&#39;xxxx&#39;,25) as smtp: try: smtp.send_message(msg) return True except: return False #定义读取ELK的方法, serverId为区分不同的ELK集群,indexData为要搜索的索引目录, bodyData为要搜索的条件, 格式为json,返回json格式的字符串 def readELK(serverId=2,indexDatα=None,bodyDatα=None,esVersion=8): #xxxx if serverId == 1: apiKey = &#39;aaaa&#39; url = &#39; https://ssss:9200&#39; #wazuh的ELK elif serverId == 3: username = &#39;wazuh&#39; password = &#39;wazuh&#39; url = &#39;https://aaaa:9200&#39; if esVersion == 8: headers = {&#34; Authorization&#34;: &#34;ApiKey&#34; &#43; apiKey} resultJson = json.loads((requests. get(url &#43; &#34;/&#34; &#43; indexData &#43; &#34;/_search&#34;, headers= headers, json=bodyData,verify=False)).text) elif esVersion == 7: resultJson = json.loads((requests. get(url &#43; &#34;/&#34; &#43; indexData &#43; &#34;/_search&#34;, auth=HTTPBasicAuth(username,password),json=bodyData,verify=False)).text) print (&#34;读取ELK数据完毕&#34;) return resultJson #定义读写jira的api的方法，第一个为url,也就是条件,第二个为jsonPost,如果要创建case则使用jsonPost,如果只是get的话第二项则不用写 def apiFromJira(url,jsonPost= None): usernameForJira = passwordForJira = &#39;xxxx&#39; urllib3. disable _ warnings() if jsonPost is None: response = requests. get(url, verify= False, auth=(usernameForJira, passwordForJira)) else: if url[-8:] == &#39;assignee&#39;: response = requests.put(url,json=jsonPost,verify=False,auth=(usernameForJira, passwordForJira)) else: response = requests.post(url,json=jsonPost,verify=False,auth=(usernameForJira, passwordForJira)) return response. text def getClientFromWazuh(option=1, params=&#39;limit=10000&#39;, action=&#39;get&#39;,urlParameters=&#39;&#39;): urllib3. disable _ warnings() #默认用户名和密码 username = password = &#39;xxxx&#39; if option == 1: host = &#39;xxxx&#39; elif option == 2: host= &#39;wazuh.bstops.com&#39; username = &#39;xxxx&#39; password = &#39;xxxx&#39; host = &#39;10.190.18.8&#39; protocol = &#39;https&#39; port = 55000 login_endpoint = &#39;security/user/authenticate&#39; login_url = f&#34;{protocol}://{host}:{port}/{login_endpoint}&#34; basic_auth = f&#34;{username}:{password}&#34;.encode() login_headers = { &#39;Content-Type&#39;: &#39;application/json&#39;, &#39;Authorization&#39;: f&#39;Basic{b64encode(basic_auth).decode()}&#39; } response = requests.post(login_url, headers = login_headers, verify= False) if response.status_code == 405: response = requests.get(login_url, headers = login_headers, verify= False) token = json.loads(response.content.decode())[&#39;data&#39;][&#39;token&#39;] requests_headers = { &#39;Content-Type&#39;: &#39;application/json&#39;, &#39;Authorization&#39;: f&#39;Bearer{token}&#39; } if action == &#39;get&#39;: if urlParameters == &#39;&#39; or &#39;agents/&#39; in urlParameters: response = requests.get(f&#34;{protocol}://{host}:{port}/{urlParameters}?{params}&amp;pretty=true&#34;,headers = requests_headers, verify=False) else: response = requests.get(f&#34;{protocol}://{host}:{port}/{urlParameters}&#34;, headers = requests_headers,verify = False,params = params) return response.text elif action == &#39;put&#39;: response = requests.put(f&#34;{protocol}://{host}:{port}/{urlParameters}?agents_list=2310429&amp;pretty=true&amp;wait_for_complete=true&#34;,headers = requests_headers,verify = False , params = params) return response.text elif action == &#39;post&#39;: response = requests.post(f&#34;{protocol}://{host}:{port}/{urlParameters}&#34;, headers= requests_headers, verify = False , params = params) return response.text " />
 
-
-  <script type="application/ld+json">
+<script type="application/ld+json">
   {
       "@context": "http://schema.org",
-      "@type": "WebSite",
-      
-      "name": "MyTreeHoles",
-      "url": "http://localhost:1313/",
-      "inLanguage": "en"
+      "@type": "BlogPosting",
+      "articleSection": "Posts",
+      "name": "基础接口脚本",
+      "url" : "http://localhost:1313/posts/basicinterface/",
+      "headline": "基础接口脚本",
+      "description": " 基于Python3写的基础接口脚本，办公用 主要的功能是读写mysql数据库，读取ELK和Wazuh，发送邮件，后续会增加更多功能，至于import的库，可以自行使用pip下载\nfrom requests import urllib3 from requests.auth import HTTPBasicAuth import json, requests, mysql.connector, re, os,smtplib from email.mime.multipart import MIMEMultipart from email.mime.text import MIMETextfrom base64 import b64encode def executeMysqlData(serverID, oper= None,dataSQL= None): if serverID == 1: mydb = mysql.onnector.connect( host=\u0022x.x.x.x\u0022, user=\u0022x.x.x.x\u0022, password=\u0022x.x.x.x\u0022, database=\u0022x.x.x.x\u0022, port=3306) elif serverID == 2 : mydb = mysql.connector.connect( host=\u0022y.y.y.y\u0022, user=\u0022 yyyy\u0022, password=\u0022 yyyy\u0022, database=\u0022 yyyy\u0022, port=3306) mycursor = mydb. cursor() if oper.upper() == \u0027WRITE\u0027 and dataSQL.split()[θ].upper() != \u0027SELECT\u0027: mycursor.execute(dataSQL) mydb.commit() mycursor.close() mydb.close() if mycursor.rowcount \u003e θ: return True else: return False elif oper.upper() == \u0027READ\u0027 and dataSQL.split()[0].upper() != \u0027INSERT\u0027 and dataSQL.split()[θ].upper() != \u0027UPDATE\u0027: mycursor. execute(dataSQL) resultList = [] for i in mycursor: resultList. append(i) mycursor.close() mydb.close() return resultList else: return \u0027 unexpected request! check and try again!\u0027 #定义 mcafee查询 ip和机器名信息，允许传递 ip地址或者机器名或者FQDN名，返回为 json数据 def apiFromMcafee(actionId=1, input= None): urllib3.disable.warnings() username = \u0027xxx\u0027 password = \u0027yyy\u0027 if actionId == 1: url= f\u0027https:\/\/xxxx:8443\/remote\/system.find?searchText={input}\u0026:output=json\u0027 curl_command=f\u0027curl -u{\u0027\u0022\u0027\u002busername\u002b\u0027\u0022\u0027}:{\u0027\u0022\u0027\u002bpassword\u002b\u0027\u0022\u0027} -s -k \u0022{url}\u0022\u0027 data = os.popen(curl_command).read() patternIP = re.compile(r\u002710.((25[θ-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)\\.){2}\u0027) record={} if bool(re. match(patternIP, input)) == True: if len(data) \u003e 20: if data[θ:2] == \u0027OK\u0027: jsonStr = json. loads(data[5:]) for i in range(0, len(jsonStr)): ip = jsonStr[i][\u0027EPOComputerProperties. IPAddress\u0027] subnetSearch = \u0022\u0027\u0022 \u002b patternIP. search(ip)[0] \u002b \u00270\/24\u0027 \u002b \u0022\u0027\u0022 querySubnetInfo = f\u0022SELECT name from IPStatus WHERE subnet = {subnetSearch}\u0022 if input == ip: #这些只是为了看着好看，所以未知的统一改成 Unknown if jsonStr[i][\u0027EPOComputerProperties. UserName\u0027] == \u0027N\/A\u0027 or jsonStr[i][\u0027EPOComputerProperties.Username\u0027] == \u0027None\u0027: user = \u0027 Unknown\u0027 else: user = jsonStr[i][\u0027EPOComputerProperties.UserName\u0027] if jsonStr[i][\u0027EPOComputerProperties. IPHostName\u0027] == \u0027N\/A\u0027 or jsonStr[i][\u0027EPOComputerProperties.IPHostName\u0027] == \u0027None\u0027: hostname = \u0027 Unknown\u0027 else: hostname = jsonStr[i][\u0027EPOComputerProperties.IPHostName\u0027] queryDepartment = executeMysqlData(1,\u0027read\u0027,querySubnetInfo) if len(queryDepartment)== 0: departmentName = \u0027Unknown\u0027 else: departmentName = queryDepartment[0][0] record = { \u0027ip\u0027:ip, \u0027username\u0027:user, \u0027department\u0027:departmentName, \u0027computerName\u0027:hostname } break else: record = False else: record = False else: record = False elif actionId == 2: url = f\u0027https:\/\/xxxx:8443\/remote\/core.executeQuery?queryId={input}\u0026:output=json\u0027 curl_command = f\u0027curl -u {\u0027\u0022\u0027 \u002b username \u002b \u0027\u0022\u0027}:{\u0027\u0022\u0027 \u002b password \u002b \u0027\u0022\u0027} -s -k\u0022{url}\u0022\u0027 response = os.popen(curl_command).read() return response #定义发送邮件接口的方法, subject为标题, data为内容, sendTo为收件人, type为邮件类型, 默认为 html, 如乘是纯文本, 则写 plain def sendMail(subject, data,sendTo=\u0027xxxx@xxxx.xxx\u0027,type=\u0027html\u0027): msg = MIMEMultipart(\u0027alternative\u0027) msg[\u0027Subject\u0027] = subject msg[\u0027From\u0027] = \u0027xxxx@xxxx.xxx\u0027 msg[\u0027To\u0027] = sendTo text_part = MIMEText(data, type) msg.attach(text_part) #此处填写邮件服务器接口 with smtplib.SMTP(\u0027xxxx\u0027,25) as smtp: try: smtp.send_message(msg) return True except: return False #定义读取ELK的方法, serverId为区分不同的ELK集群,indexData为要搜索的索引目录, bodyData为要搜索的条件, 格式为json,返回json格式的字符串 def readELK(serverId=2,indexDatα=None,bodyDatα=None,esVersion=8): #xxxx if serverId == 1: apiKey = \u0027aaaa\u0027 url = \u0027 https:\/\/ssss:9200\u0027 #wazuh的ELK elif serverId == 3: username = \u0027wazuh\u0027 password = \u0027wazuh\u0027 url = \u0027https:\/\/aaaa:9200\u0027 if esVersion == 8: headers = {\u0022 Authorization\u0022: \u0022ApiKey\u0022 \u002b apiKey} resultJson = json.loads((requests. get(url \u002b \u0022\/\u0022 \u002b indexData \u002b \u0022\/_search\u0022, headers= headers, json=bodyData,verify=False)).text) elif esVersion == 7: resultJson = json.loads((requests. get(url \u002b \u0022\/\u0022 \u002b indexData \u002b \u0022\/_search\u0022, auth=HTTPBasicAuth(username,password),json=bodyData,verify=False)).text) print (\u0022读取ELK数据完毕\u0022) return resultJson #定义读写jira的api的方法，第一个为url,也就是条件,第二个为jsonPost,如果要创建case则使用jsonPost,如果只是get的话第二项则不用写 def apiFromJira(url,jsonPost= None): usernameForJira = passwordForJira = \u0027xxxx\u0027 urllib3. disable _ warnings() if jsonPost is None: response = requests. get(url, verify= False, auth=(usernameForJira, passwordForJira)) else: if url[-8:] == \u0027assignee\u0027: response = requests.put(url,json=jsonPost,verify=False,auth=(usernameForJira, passwordForJira)) else: response = requests.post(url,json=jsonPost,verify=False,auth=(usernameForJira, passwordForJira)) return response. text def getClientFromWazuh(option=1, params=\u0027limit=10000\u0027, action=\u0027get\u0027,urlParameters=\u0027\u0027): urllib3. disable _ warnings() #默认用户名和密码 username = password = \u0027xxxx\u0027 if option == 1: host = \u0027xxxx\u0027 elif option == 2: host= \u0027wazuh.bstops.com\u0027 username = \u0027xxxx\u0027 password = \u0027xxxx\u0027 host = \u002710.190.18.8\u0027 protocol = \u0027https\u0027 port = 55000 login_endpoint = \u0027security\/user\/authenticate\u0027 login_url = f\u0022{protocol}:\/\/{host}:{port}\/{login_endpoint}\u0022 basic_auth = f\u0022{username}:{password}\u0022.encode() login_headers = { \u0027Content-Type\u0027: \u0027application\/json\u0027, \u0027Authorization\u0027: f\u0027Basic{b64encode(basic_auth).decode()}\u0027 } response = requests.post(login_url, headers = login_headers, verify= False) if response.status_code == 405: response = requests.get(login_url, headers = login_headers, verify= False) token = json.loads(response.content.decode())[\u0027data\u0027][\u0027token\u0027] requests_headers = { \u0027Content-Type\u0027: \u0027application\/json\u0027, \u0027Authorization\u0027: f\u0027Bearer{token}\u0027 } if action == \u0027get\u0027: if urlParameters == \u0027\u0027 or \u0027agents\/\u0027 in urlParameters: response = requests.get(f\u0022{protocol}:\/\/{host}:{port}\/{urlParameters}?{params}\u0026pretty=true\u0022,headers = requests_headers, verify=False) else: response = requests.get(f\u0022{protocol}:\/\/{host}:{port}\/{urlParameters}\u0022, headers = requests_headers,verify = False,params = params) return response.text elif action == \u0027put\u0027: response = requests.put(f\u0022{protocol}:\/\/{host}:{port}\/{urlParameters}?agents_list=2310429\u0026pretty=true\u0026wait_for_complete=true\u0022,headers = requests_headers,verify = False , params = params) return response.text elif action == \u0027post\u0027: response = requests.post(f\u0022{protocol}:\/\/{host}:{port}\/{urlParameters}\u0022, headers= requests_headers, verify = False , params = params) return response.text ",
+      "wordCount" : "618",
+      "inLanguage": "en",
+      "isFamilyFriendly": "true",
+      "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "http://localhost:1313/posts/basicinterface/"
+      },
+      "keywords" : [ "Python" ],
+      "author" : [
+      ],
+      "copyrightHolder" : "MyTreeHoles",
+      "copyrightYear" : "2025",
+      "dateCreated": "2025-02-08T14:00:00.00Z",
+      "datePublished": "2025-02-08T14:00:00.00Z",
+      "dateModified": "2025-02-08T14:00:00.00Z",
+      "publisher":{
+          "@type":"Organization",
+          "name": "MyTreeHoles",
+          "url": "http://localhost:1313/",
+          "logo": {
+              "@type": "ImageObject",
+              "url": "http://localhost:1313/brand.svg",
+              "width":"32",
+              "height":"32"
+          }
+      }
   }
   </script>
 
@@ -124,7 +168,7 @@
   href="/custom.css"
   media="all"
 />
-  <link href="http://localhost:1313/" rel="canonical" type="text/html" />
+  <link href="http://localhost:1313/posts/basicinterface/" rel="canonical" type="text/html" />
     <link href="http://localhost:1313/index.xml" rel="alternate" type="application/rss+xml" title="MyTreeHoles rss Feed" />
 
 <!-- Made with Geekblog theme https://github.com/thegeeklab/hugo-geekblog -->
@@ -233,22 +277,71 @@
 
       <main class="gblog-page container">
         
+  <article class="gblog-post">
+    <header class="gblog-post__header">
+      
+      
+
+
+      <h1 class="gblog-post__title">基础接口脚本</h1>
+
+      
+        <div class="flex flex-wrap align-center gblog-post__meta gblog-post__meta--head">
+          <span class="flex align-center no-wrap gblog-post__meta--update">
+  <svg class="gblog-icon gblog_date"><use xlink:href="#gblog_date"></use></svg>
+  <span class="gblog-post__tag">
+    <time datetime="2025-02-08T14:00:00&#43;08:00">
+      
+      Feb 8, 2025
+    </time>
+  </span>
+</span>
+
+<span class="flex align-center no-wrap gblog-post__meta--readtime">
+  <svg class="gblog-icon gblog_timer"><use xlink:href="#gblog_timer"></use></svg>
+  <span class="gblog-post__tag">3 min read</span>
+</span>
+
+
+
+
+
+
+
+
   
-  
+    
+    
+      
+        <span class="flex align-center no-wrap gblog-post__meta--tag">
+          <svg class="gblog-icon gblog_bookmark"><use xlink:href="#gblog_bookmark"></use></svg>
+          
+  <span class="gblog-post__tag gblog-button gblog-button--regular">
+    <a
+      class="gblog-button__link"
+      href="/tags/python/"
+      title="All posts tagged with 'Python'"
+    >
+      Python
+    </a>
+  </span>
+
+        </span>
+      
+    
     
   
 
-  
-  
-    <article class="gblog-post">
-      <header class="gblog-post__header">
-        <h1 class="gblog-post__title">
-          <a href="/posts/basicinterface/">基础接口脚本</a>
-        </h1>
-      </header>
 
-      <section class="gblog-markdown">
-        <div class="flex align-center gblog-post__anchorwrap">
+
+
+
+
+        </div>
+      
+    </header>
+    <section class="gblog-markdown">
+      <div class="flex align-center gblog-post__anchorwrap">
     <h1 id="基于python3写的基础接口脚本办公用"
     >
         基于Python3写的基础接口脚本，办公用
@@ -437,197 +530,8 @@
 </span></span><span style="display:flex;"><span>                response <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>post(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>protocol<span style="color:#e6db74">}</span><span style="color:#e6db74">://</span><span style="color:#e6db74">{</span>host<span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">{</span>port<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">{</span>urlParameters<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>, headers<span style="color:#f92672">=</span> requests_headers, verify <span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span> , params <span style="color:#f92672">=</span> params)
 </span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> response<span style="color:#f92672">.</span>text
 </span></span></code></pre></div>
-      </section>
-      <div class="gblog-post__readmore">
-        
-      </div>
-
-      <footer class="gblog-post__footer">
-        <div class="flex flex-wrap align-center gblog-post__meta">
-          <span class="flex align-center no-wrap gblog-post__meta--update">
-  <svg class="gblog-icon gblog_date"><use xlink:href="#gblog_date"></use></svg>
-  <span class="gblog-post__tag">
-    <time datetime="2025-02-08T14:00:00&#43;08:00">
-      
-      Feb 8, 2025
-    </time>
-  </span>
-</span>
-
-<span class="flex align-center no-wrap gblog-post__meta--readtime">
-  <svg class="gblog-icon gblog_timer"><use xlink:href="#gblog_timer"></use></svg>
-  <span class="gblog-post__tag">3 min read</span>
-</span>
-
-
-
-
-
-
-
-
-  
-    
-    
-      
-        <span class="flex align-center no-wrap gblog-post__meta--tag">
-          <svg class="gblog-icon gblog_bookmark"><use xlink:href="#gblog_bookmark"></use></svg>
-          
-  <span class="gblog-post__tag gblog-button gblog-button--regular">
-    <a
-      class="gblog-button__link"
-      href="/tags/python/"
-      title="All posts tagged with 'Python'"
-    >
-      Python
-    </a>
-  </span>
-
-        </span>
-      
-    
-    
-  
-
-
-
-
-
-
-        </div>
-      </footer>
-    </article>
-  
-    <article class="gblog-post">
-      <header class="gblog-post__header">
-        <h1 class="gblog-post__title">
-          <a href="/posts/howtouse/">如何使用Hugo搭建自己的静态博客</a>
-        </h1>
-      </header>
-
-      <section class="gblog-markdown">
-        <div class="flex align-center gblog-post__anchorwrap">
-    <h1 id="免费搭建一个静态博客"
-    >
-        免费搭建一个静态博客
-    </h1>
-    <a data-clipboard-text="http://localhost:1313/posts/howtouse/#免费搭建一个静态博客" class="gblog-post__anchor clip flex align-center" aria-label="Anchor 免费搭建一个静态博客" href="#%e5%85%8d%e8%b4%b9%e6%90%ad%e5%bb%ba%e4%b8%80%e4%b8%aa%e9%9d%99%e6%80%81%e5%8d%9a%e5%ae%a2">
-        <svg class="gblog-icon gblog_link"><use xlink:href="#gblog_link"></use></svg>
-    </a>
-</div>
-<p>独立博客表面上是网站，但实际上我们作为内容的创作者，需要关注的只是它的内容——我们以后会经常更新的只是内容的部分。一个博客网站可以分为这几个部分：</p>
-<p><img
-  src="/howtouse/blog-site.png"
-  alt="blog-site"
-  title="blog-site"
-/></p>
-<p>最常见的博客系统 WordPress 是一款动态博客系统（PHP 程序），这类系统需要在云主机商（如阿里云）那里买专门的空间或来存储和发布（存储并运行 PHP 程序）我们的博客网站。</p>
-<!-- raw HTML omitted -->
-<div class="flex align-center gblog-post__anchorwrap">
-    <h2 id="静态博客系统"
-    >
-        静态博客系统
-    </h2>
-    <a data-clipboard-text="http://localhost:1313/posts/howtouse/#静态博客系统" class="gblog-post__anchor clip flex align-center" aria-label="Anchor 静态博客系统" href="#%e9%9d%99%e6%80%81%e5%8d%9a%e5%ae%a2%e7%b3%bb%e7%bb%9f">
-        <svg class="gblog-icon gblog_link"><use xlink:href="#gblog_link"></use></svg>
-    </a>
-</div>
-<p>所谓静态博客系统指的是，博客网站是由一系列的静态 HTML 文件，以及对应的多媒体素材等组成，只要找一个可以存储文件的平台即可发布网站。有许多工具，可以把一篇篇博客文章的 Markdown 文件，配上博客主题之后转换为可以直接发布的 HTML 文件。</p>
-<p><img
-  src="/howtouse/templating.png"
-  alt="templating"
-  title="templating"
-/></p>
-<p>静态博客系统的原理，就如同这篇教程，我创作时，写的是 Markdown 文件（<a
-  class="gblog-markdown__link"
-  href="https://raw.githubusercontent.com/jijiechen/static-blog-manual/master/readme.md"
->readme.md</a>），但你看到的确实是带有格式和交互的网页。因为这背后，有 GitHub 在帮我完成了从静态 Markdown 到静态 HTML 的转换。</p>
-<p>如果要搭建一个静态博客网站，我们需要的工具有：</p>
-<ul>
-<li>把 Markdown 转化为 HTML 的工具（即静态网站生成工具）</li>
-<li>博客样式主题（通常与工具是配套的，一般来说找到了生成工具就找到了主题）</li>
-<li>能存储和发布静态文件的平台</li>
-</ul>
-<p>常用的静态网站生成工具有 <a
-  class="gblog-markdown__link"
-  href="https://jekyllrb.com/"
->jekyll</a>, <a
-  class="gblog-markdown__link"
-  href="https://hexo.io/"
->hexo</a> 和 <a
-  class="gblog-markdown__link"
-  href="https://gohugo.io/"
->hugo</a> 等。接下来，我以 hugo 的使用为例介绍如何搭建一个静态博客网站。</p>
-      </section>
-      <div class="gblog-post__readmore">
-        
-          <a
-            class="flex-inline align-center fake-link"
-            title="Read full post"
-            href="/posts/howtouse/"
-          >
-            Read full post
-            <i class="gblog-icon">gblog_arrow_right</i>
-          </a>
-        
-      </div>
-
-      <footer class="gblog-post__footer">
-        <div class="flex flex-wrap align-center gblog-post__meta">
-          <span class="flex align-center no-wrap gblog-post__meta--update">
-  <svg class="gblog-icon gblog_date"><use xlink:href="#gblog_date"></use></svg>
-  <span class="gblog-post__tag">
-    <time datetime="2025-02-08T14:00:00&#43;08:00">
-      
-      Feb 8, 2025
-    </time>
-  </span>
-</span>
-
-<span class="flex align-center no-wrap gblog-post__meta--readtime">
-  <svg class="gblog-icon gblog_timer"><use xlink:href="#gblog_timer"></use></svg>
-  <span class="gblog-post__tag">3 min read</span>
-</span>
-
-
-
-
-
-
-
-
-  
-    
-    
-    
-  
-    
-    
-    
-  
-
-
-
-
-
-
-        </div>
-      </footer>
-    </article>
-  
-  
-
-
-<nav class="gblog-paging flex flex-even align-center" role="navigation">
-  <div class="gblog-paging__item gblog-paging__item--prev">
-    
-  </div>
-  <div class="gblog-paging__state">Page 1 of 1</div>
-  <div class="gblog-paging__item gblog-paging__item--next">
-    
-  </div>
-</nav>
-
+    </section>
+  </article>
 
       </main>
 
