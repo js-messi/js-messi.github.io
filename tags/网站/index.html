@@ -13,7 +13,7 @@
 <meta name="generator" content="Hugo 0.143.1">
   <meta name="robots" content="noindex, nofollow" />
 
-    <title>Categories | MyTreeHoles</title>
+    <title>网站 | MyTreeHoles</title>
 
     <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg" />
 <link
@@ -34,17 +34,17 @@
     
   <meta
     property="og:title"
-    content="Categories"
+    content="网站"
   />
   <meta property="og:site_name" content="MyTreeHoles" />
 <meta property="og:type" content="website" />
-<meta property="og:url" content="http://localhost:1313/categories/" />
+<meta property="og:url" content="http://localhost:1313/tags/%E7%BD%91%E7%AB%99/" />
 
 
 
 
   <meta name="twitter:card" content="summary" />
-<meta name="twitter:title" content="Categories" />
+<meta name="twitter:title" content="网站" />
 
 
 
@@ -118,7 +118,7 @@
   href="/custom.css"
   media="all"
 />
-  <link href="http://localhost:1313/categories/" rel="canonical" type="text/html" />
+  <link href="http://localhost:1313/tags/%E7%BD%91%E7%AB%99/" rel="canonical" type="text/html" />
     <link href="http://localhost:1313/index.xml" rel="alternate" type="application/rss+xml" title="MyTreeHoles rss Feed" />
 
 <!-- Made with Geekblog theme https://github.com/thegeeklab/hugo-geekblog -->
@@ -185,6 +185,41 @@
     
     
       
+        
+          <li>
+            <a
+              class="gblog-nav__entry"
+              href="/tags/hugo/"
+            >
+              Hugo
+            </a>
+          </li>
+        
+      
+        
+          <li>
+            <a
+              class="gblog-nav__entry"
+              href="/tags/%E5%8D%9A%E5%AE%A2/"
+            >
+              博客
+            </a>
+          </li>
+        
+      
+        
+          <li>
+            <a
+              class="gblog-nav__entry
+                 is-active
+              "
+              href="/tags/%E7%BD%91%E7%AB%99/"
+            >
+              网站
+            </a>
+          </li>
+        
+      
     
     
   </ul>
@@ -196,6 +231,147 @@
         
   
   
+
+  
+  
+    <article class="gblog-post">
+      <header class="gblog-post__header">
+        <h1 class="gblog-post__title">
+          <a href="/posts/howtouse/">如何使用Hugo搭建自己的静态博客</a>
+        </h1>
+      </header>
+
+      <section class="gblog-markdown">
+        <div class="flex align-center gblog-post__anchorwrap">
+    <h1 id="免费搭建一个静态博客"
+    >
+        免费搭建一个静态博客
+    </h1>
+    <a data-clipboard-text="http://localhost:1313/posts/howtouse/#免费搭建一个静态博客" class="gblog-post__anchor clip flex align-center" aria-label="Anchor 免费搭建一个静态博客" href="#%e5%85%8d%e8%b4%b9%e6%90%ad%e5%bb%ba%e4%b8%80%e4%b8%aa%e9%9d%99%e6%80%81%e5%8d%9a%e5%ae%a2">
+        <svg class="gblog-icon gblog_link"><use xlink:href="#gblog_link"></use></svg>
+    </a>
+</div>
+<p>独立博客表面上是网站，但实际上我们作为内容的创作者，需要关注的只是它的内容——我们以后会经常更新的只是内容的部分。一个博客网站可以分为这几个部分：</p>
+<p><img
+  src="/howtouse/blog-site.png"
+  alt="blog-site"
+  title="blog-site"
+/></p>
+<p>最常见的博客系统 WordPress 是一款动态博客系统（PHP 程序），这类系统需要在云主机商（如阿里云）那里买专门的空间或来存储和发布（存储并运行 PHP 程序）我们的博客网站。</p>
+<!-- raw HTML omitted -->
+<div class="flex align-center gblog-post__anchorwrap">
+    <h2 id="静态博客系统"
+    >
+        静态博客系统
+    </h2>
+    <a data-clipboard-text="http://localhost:1313/posts/howtouse/#静态博客系统" class="gblog-post__anchor clip flex align-center" aria-label="Anchor 静态博客系统" href="#%e9%9d%99%e6%80%81%e5%8d%9a%e5%ae%a2%e7%b3%bb%e7%bb%9f">
+        <svg class="gblog-icon gblog_link"><use xlink:href="#gblog_link"></use></svg>
+    </a>
+</div>
+<p>所谓静态博客系统指的是，博客网站是由一系列的静态 HTML 文件，以及对应的多媒体素材等组成，只要找一个可以存储文件的平台即可发布网站。有许多工具，可以把一篇篇博客文章的 Markdown 文件，配上博客主题之后转换为可以直接发布的 HTML 文件。</p>
+<p><img
+  src="/howtouse/templating.png"
+  alt="templating"
+  title="templating"
+/></p>
+<p>静态博客系统的原理，就如同这篇教程，我创作时，写的是 Markdown 文件（<a
+  class="gblog-markdown__link"
+  href="https://raw.githubusercontent.com/jijiechen/static-blog-manual/master/readme.md"
+>readme.md</a>），但你看到的确实是带有格式和交互的网页。因为这背后，有 GitHub 在帮我完成了从静态 Markdown 到静态 HTML 的转换。</p>
+<p>如果要搭建一个静态博客网站，我们需要的工具有：</p>
+<ul>
+<li>把 Markdown 转化为 HTML 的工具（即静态网站生成工具）</li>
+<li>博客样式主题（通常与工具是配套的，一般来说找到了生成工具就找到了主题）</li>
+<li>能存储和发布静态文件的平台</li>
+</ul>
+<p>常用的静态网站生成工具有 <a
+  class="gblog-markdown__link"
+  href="https://jekyllrb.com/"
+>jekyll</a>, <a
+  class="gblog-markdown__link"
+  href="https://hexo.io/"
+>hexo</a> 和 <a
+  class="gblog-markdown__link"
+  href="https://gohugo.io/"
+>hugo</a> 等。接下来，我以 hugo 的使用为例介绍如何搭建一个静态博客网站。</p>
+      </section>
+      <div class="gblog-post__readmore">
+        
+          <a
+            class="flex-inline align-center fake-link"
+            title="Read full post"
+            href="/posts/howtouse/"
+          >
+            Read full post
+            <i class="gblog-icon">gblog_arrow_right</i>
+          </a>
+        
+      </div>
+
+      <footer class="gblog-post__footer">
+        <div class="flex flex-wrap align-center gblog-post__meta">
+          <span class="flex align-center no-wrap gblog-post__meta--update">
+  <svg class="gblog-icon gblog_date"><use xlink:href="#gblog_date"></use></svg>
+  <span class="gblog-post__tag">
+    <time datetime="2025-02-08T14:00:00&#43;08:00">
+      
+      Feb 8, 2025
+    </time>
+  </span>
+</span>
+
+<span class="flex align-center no-wrap gblog-post__meta--readtime">
+  <svg class="gblog-icon gblog_timer"><use xlink:href="#gblog_timer"></use></svg>
+  <span class="gblog-post__tag">3 min read</span>
+</span>
+
+
+
+
+
+
+
+
+  
+    
+    
+      
+        <span class="flex align-center no-wrap gblog-post__meta--tag">
+          <svg class="gblog-icon gblog_bookmark"><use xlink:href="#gblog_bookmark"></use></svg>
+          
+  <span class="gblog-post__tag gblog-button gblog-button--regular">
+    <a
+      class="gblog-button__link"
+      href="/tags/hugo/"
+      title="All posts tagged with 'hugo'"
+    >
+      hugo
+    </a>
+  </span>
+
+        </span>
+      
+    
+    
+  
+    
+    
+    
+  
+    
+    
+    
+  
+
+
+
+
+
+
+        </div>
+      </footer>
+    </article>
+  
   
 
 
@@ -203,7 +379,7 @@
   <div class="gblog-paging__item gblog-paging__item--prev">
     
   </div>
-  <div class="gblog-paging__state">Page 1 of 0</div>
+  <div class="gblog-paging__state">Page 1 of 1</div>
   <div class="gblog-paging__item gblog-paging__item--next">
     
   </div>

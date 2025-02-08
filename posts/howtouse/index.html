@@ -19,7 +19,7 @@
 如果要搭建一个静态博客网站，我们需要的工具有：
 把 Markdown 转化为 HTML 的工具（即静态网站生成工具） 博客样式主题（通常与工具是配套的，一般来说找到了生成工具就找到了主题） 能存储和发布静态文件的平台 常用的静态网站生成工具有 jekyll, hexo 和 hugo 等。接下来，我以 hugo 的使用为例介绍如何搭建一个静态博客网站。" />
 
-    <title>Howtouse | My New Hugo Site</title>
+    <title>如何使用Hugo搭建自己的静态博客 | MyTreeHoles</title>
 
     <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg" />
 <link
@@ -40,9 +40,9 @@
     
   <meta
     property="og:title"
-    content="Howtouse"
+    content="如何使用Hugo搭建自己的静态博客"
   />
-  <meta property="og:site_name" content="My New Hugo Site" />
+  <meta property="og:site_name" content="MyTreeHoles" />
   <meta property="og:description" content=" 免费搭建一个静态博客 独立博客表面上是网站，但实际上我们作为内容的创作者，需要关注的只是它的内容——我们以后会经常更新的只是内容的部分。一个博客网站可以分为这几个部分：
 最常见的博客系统 WordPress 是一款动态博客系统（PHP 程序），这类系统需要在云主机商（如阿里云）那里买专门的空间或来存储和发布（存储并运行 PHP 程序）我们的博客网站。
 静态博客系统 所谓静态博客系统指的是，博客网站是由一系列的静态 HTML 文件，以及对应的多媒体素材等组成，只要找一个可以存储文件的平台即可发布网站。有许多工具，可以把一篇篇博客文章的 Markdown 文件，配上博客主题之后转换为可以直接发布的 HTML 文件。
@@ -53,10 +53,18 @@
 <meta property="og:url" content="http://localhost:1313/posts/howtouse/" />
 
 <meta property="article:section" content="Posts" />
+    <meta
+      property="article:published_time"
+      content="2025-02-08T14:00:00+08:00"
+    />
+    <meta
+      property="article:modified_time"
+      content="2025-02-08T14:00:00+08:00"
+    />
 
 
   <meta name="twitter:card" content="summary" />
-<meta name="twitter:title" content="Howtouse" />
+<meta name="twitter:title" content="如何使用Hugo搭建自己的静态博客" />
   <meta name="twitter:description" content=" 免费搭建一个静态博客 独立博客表面上是网站，但实际上我们作为内容的创作者，需要关注的只是它的内容——我们以后会经常更新的只是内容的部分。一个博客网站可以分为这几个部分：
 最常见的博客系统 WordPress 是一款动态博客系统（PHP 程序），这类系统需要在云主机商（如阿里云）那里买专门的空间或来存储和发布（存储并运行 PHP 程序）我们的博客网站。
 静态博客系统 所谓静态博客系统指的是，博客网站是由一系列的静态 HTML 文件，以及对应的多媒体素材等组成，只要找一个可以存储文件的平台即可发布网站。有许多工具，可以把一篇篇博客文章的 Markdown 文件，配上博客主题之后转换为可以直接发布的 HTML 文件。
@@ -69,27 +77,28 @@
       "@context": "http://schema.org",
       "@type": "BlogPosting",
       "articleSection": "Posts",
-      "name": "Howtouse",
+      "name": "如何使用Hugo搭建自己的静态博客",
       "url" : "http://localhost:1313/posts/howtouse/",
-      "headline": "Howtouse",
+      "headline": "如何使用Hugo搭建自己的静态博客",
       "description": " 免费搭建一个静态博客 独立博客表面上是网站，但实际上我们作为内容的创作者，需要关注的只是它的内容——我们以后会经常更新的只是内容的部分。一个博客网站可以分为这几个部分：\n最常见的博客系统 WordPress 是一款动态博客系统（PHP 程序），这类系统需要在云主机商（如阿里云）那里买专门的空间或来存储和发布（存储并运行 PHP 程序）我们的博客网站。\n静态博客系统 所谓静态博客系统指的是，博客网站是由一系列的静态 HTML 文件，以及对应的多媒体素材等组成，只要找一个可以存储文件的平台即可发布网站。有许多工具，可以把一篇篇博客文章的 Markdown 文件，配上博客主题之后转换为可以直接发布的 HTML 文件。\n静态博客系统的原理，就如同这篇教程，我创作时，写的是 Markdown 文件（readme.md），但你看到的确实是带有格式和交互的网页。因为这背后，有 GitHub 在帮我完成了从静态 Markdown 到静态 HTML 的转换。\n如果要搭建一个静态博客网站，我们需要的工具有：\n把 Markdown 转化为 HTML 的工具（即静态网站生成工具） 博客样式主题（通常与工具是配套的，一般来说找到了生成工具就找到了主题） 能存储和发布静态文件的平台 常用的静态网站生成工具有 jekyll, hexo 和 hugo 等。接下来，我以 hugo 的使用为例介绍如何搭建一个静态博客网站。",
-      "wordCount" : "506",
+      "wordCount" : "556",
       "inLanguage": "en",
       "isFamilyFriendly": "true",
       "mainEntityOfPage": {
           "@type": "WebPage",
           "@id": "http://localhost:1313/posts/howtouse/"
       },
+      "keywords" : [ "博客" , "网站" , "hugo" ],
       "author" : [
       ],
-      "copyrightHolder" : "My New Hugo Site",
-      "copyrightYear" : "0001",
-      "dateCreated": "0001-01-01T00:00:00.00Z",
-      "datePublished": "0001-01-01T00:00:00.00Z",
-      "dateModified": "0001-01-01T00:00:00.00Z",
+      "copyrightHolder" : "MyTreeHoles",
+      "copyrightYear" : "2025",
+      "dateCreated": "2025-02-08T14:00:00.00Z",
+      "datePublished": "2025-02-08T14:00:00.00Z",
+      "dateModified": "2025-02-08T14:00:00.00Z",
       "publisher":{
           "@type":"Organization",
-          "name": "My New Hugo Site",
+          "name": "MyTreeHoles",
           "url": "http://localhost:1313/",
           "logo": {
               "@type": "ImageObject",
@@ -172,7 +181,7 @@
   media="all"
 />
   <link href="http://localhost:1313/posts/howtouse/" rel="canonical" type="text/html" />
-    <link href="http://localhost:1313/index.xml" rel="alternate" type="application/rss+xml" title="My New Hugo Site rss Feed" />
+    <link href="http://localhost:1313/index.xml" rel="alternate" type="application/rss+xml" title="MyTreeHoles rss Feed" />
 
 <!-- Made with Geekblog theme https://github.com/thegeeklab/hugo-geekblog -->
 
@@ -202,7 +211,7 @@
             src="/brand.svg"
             alt=""
           />
-          <span class="gblog-brand__title">My New Hugo Site</span>
+          <span class="gblog-brand__title">MyTreeHoles</span>
         </span>
         
       </a>
@@ -238,6 +247,39 @@
     
     
       
+        
+          <li>
+            <a
+              class="gblog-nav__entry"
+              href="/tags/hugo/"
+            >
+              Hugo
+            </a>
+          </li>
+        
+      
+        
+          <li>
+            <a
+              class="gblog-nav__entry"
+              href="/tags/%E5%8D%9A%E5%AE%A2/"
+            >
+              博客
+            </a>
+          </li>
+        
+      
+        
+          <li>
+            <a
+              class="gblog-nav__entry"
+              href="/tags/%E7%BD%91%E7%AB%99/"
+            >
+              网站
+            </a>
+          </li>
+        
+      
     
     
   </ul>
@@ -253,16 +295,16 @@
       
 
 
-      <h1 class="gblog-post__title">Howtouse</h1>
+      <h1 class="gblog-post__title">如何使用Hugo搭建自己的静态博客</h1>
 
       
         <div class="flex flex-wrap align-center gblog-post__meta gblog-post__meta--head">
           <span class="flex align-center no-wrap gblog-post__meta--update">
   <svg class="gblog-icon gblog_date"><use xlink:href="#gblog_date"></use></svg>
   <span class="gblog-post__tag">
-    <time datetime="0001-01-01T00:00:00Z">
+    <time datetime="2025-02-08T14:00:00&#43;08:00">
       
-      Jan 1, 0001
+      Feb 8, 2025
     </time>
   </span>
 </span>
@@ -278,6 +320,37 @@
 
 
 
+
+  
+    
+    
+      
+        <span class="flex align-center no-wrap gblog-post__meta--tag">
+          <svg class="gblog-icon gblog_bookmark"><use xlink:href="#gblog_bookmark"></use></svg>
+          
+  <span class="gblog-post__tag gblog-button gblog-button--regular">
+    <a
+      class="gblog-button__link"
+      href="/tags/hugo/"
+      title="All posts tagged with 'hugo'"
+    >
+      hugo
+    </a>
+  </span>
+
+        </span>
+      
+    
+    
+  
+    
+    
+    
+  
+    
+    
+    
+  
 
 
 
@@ -366,9 +439,9 @@
 <li>输入相应的安装命令即可（Windows 上用 <code>choco install hugo</code>，macOS 上用 <code>brew install hugo</code>）</li>
 </ol>
 <p>完成之后，确保你能够从命令行中运行 <code>hugo version</code> 命令，并看到如下输出：</p>
-<pre tabindex="0"><code># hugo version
-Hugo Static Site Generator v0.40.1 darwin/amd64 BuildDate:
-</code></pre><p>到此时，你的 hugo 就安装成功了。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#75715e"># hugo version</span>
+</span></span><span style="display:flex;"><span>Hugo Static Site Generator v0.40.1 darwin/amd64 BuildDate:
+</span></span></code></pre></div><p>到此时，你的 hugo 就安装成功了。</p>
 <!-- raw HTML omitted -->
 <div class="flex align-center gblog-post__anchorwrap">
     <h2 id="准备创建新的博客网站"
@@ -381,11 +454,11 @@ Hugo Static Site Generator v0.40.1 darwin/amd64 BuildDate:
 </div>
 <p><em>仅需操作一次。</em></p>
 <p>接下来我们用 <code>hugo new site myblog</code> 创建新的网站 myblog，这里以后将你以后创作内容和修葺网站的地方。</p>
-<pre tabindex="0"><code># hugo new site myblog
-Congratulations! Your new Hugo site is created in /path/to/myblog.
-...
-Visit https://gohugo.io/ for quickstart guide and full documentation.
-</code></pre><p>新创建好的网站不包含任何内容，所以我们需要根据屏幕上的提示去下载一个主题。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#75715e"># hugo new site myblog</span>
+</span></span><span style="display:flex;"><span>Congratulations! Your new Hugo site is created in /path/to/myblog.
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>Visit https://gohugo.io/ <span style="color:#66d9ef">for</span> quickstart guide and full documentation.
+</span></span></code></pre></div><p>新创建好的网站不包含任何内容，所以我们需要根据屏幕上的提示去下载一个主题。</p>
 <!-- raw HTML omitted -->
 <div class="flex align-center gblog-post__anchorwrap">
     <h2 id="准备定制你的主题"
@@ -413,35 +486,35 @@ Visit https://gohugo.io/ for quickstart guide and full documentation.
 <li>如果是以 <code>Download as zip</code> 方式下载的，解压后，需要将文件夹名字中的 <code>-master</code> 字样去掉。</li>
 </ol>
 <p>这时，可以用文本编辑器打开网站目录 <code>myblog</code> 下的 <code>config.toml</code> 文件，并且在其中添加一行来启用新加载的主题：</p>
-<pre tabindex="0"><code>theme = &#34;hyde&#34;
-</code></pre><p>看到该文件中的其他配置，相信你已经猜到他们的用途了。没错，除了指定主题名字，你还可以修改其他配置，比如网站的名字、语言等。另外，一般来说，各个主题还支持一些自有配置，比如，hyde 还支持把导航放到右边，只需要添加如下配置即可：</p>
-<pre tabindex="0"><code>theme = &#34;hyde&#34;
-
-[params]
-  layoutReverse = true
-</code></pre><p>不同的主题可能支持不同的特有配置，请参考主题的文档来了解详细情况。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>theme <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;hyde&#34;</span>
+</span></span></code></pre></div><p>看到该文件中的其他配置，相信你已经猜到他们的用途了。没错，除了指定主题名字，你还可以修改其他配置，比如网站的名字、语言等。另外，一般来说，各个主题还支持一些自有配置，比如，hyde 还支持把导航放到右边，只需要添加如下配置即可：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>theme <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;hyde&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>params<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>  layoutReverse <span style="color:#f92672">=</span> true
+</span></span></code></pre></div><p>不同的主题可能支持不同的特有配置，请参考主题的文档来了解详细情况。</p>
 <p>完成主题的定制之后，用 <code>cd myblog</code> 将命令行环境切换到网站所在目录，接着用 <code>hugo server</code> 命令就可以在本地预览新创建的网站了，输入命令后，用浏览器打开 http://localhost:1313 即可在本机访问自己的博客网站。如果预览后发现不满意的地方，还可以继续通过修改配置、再预览的方式持续定制主题。</p>
-<pre tabindex="0"><code># cd myblog
-# hugo server
-                   | EN
-+------------------+----+
-  Pages            |  7
-  Paginator pages  |  0
-  Non-page files   |  0
-  Static files     |  6
-  Processed images |  0
-  Aliases          |  0
-  Sitemaps         |  1
-  Cleaned          |  0
-
-Total in 18 ms
-Watching for changes in /path/to/myblog/{content,data,layouts,static,themes}
-Watching for config changes in /path/to/myblog/config.toml
-Serving pages from memory
-Running in Fast Render Mode. For full rebuilds on change: hugo server --disableFastRender
-Web Server is available at http://localhost:1313/ (bind address 127.0.0.1)
-Press Ctrl+C to stop
-</code></pre><p>可以<a
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#75715e"># cd myblog</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># hugo server</span>
+</span></span><span style="display:flex;"><span>                   | EN
+</span></span><span style="display:flex;"><span>+------------------+----+
+</span></span><span style="display:flex;"><span>  Pages            |  <span style="color:#ae81ff">7</span>
+</span></span><span style="display:flex;"><span>  Paginator pages  |  <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>  Non-page files   |  <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>  Static files     |  <span style="color:#ae81ff">6</span>
+</span></span><span style="display:flex;"><span>  Processed images |  <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>  Aliases          |  <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>  Sitemaps         |  <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>  Cleaned          |  <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Total in <span style="color:#ae81ff">18</span> ms
+</span></span><span style="display:flex;"><span>Watching <span style="color:#66d9ef">for</span> changes in /path/to/myblog/<span style="color:#f92672">{</span>content,data,layouts,static,themes<span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>Watching <span style="color:#66d9ef">for</span> config changes in /path/to/myblog/config.toml
+</span></span><span style="display:flex;"><span>Serving pages from memory
+</span></span><span style="display:flex;"><span>Running in Fast Render Mode. For full rebuilds on change: hugo server --disableFastRender
+</span></span><span style="display:flex;"><span>Web Server is available at http://localhost:1313/ <span style="color:#f92672">(</span>bind address 127.0.0.1<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>Press Ctrl+C to stop
+</span></span></code></pre></div><p>可以<a
   class="gblog-markdown__link"
   href="https://gohugo.io/getting-started/quick-start/#recapitulation"
 >从这里查看完整的命令行操作步骤</a>：从安装 hugo，到预览网站的整个过程。</p>
@@ -462,26 +535,27 @@ Press Ctrl+C to stop
 <li>在 <code>content</code> 目录，添加并编辑新的 Markdown 内容文件</li>
 <li>使用 hugo serve 在本地预览你的博客网站（http://localhost:1313）</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ps" data-lang="ps"><span style="display:flex;"><span><span style="color:#a6e22e">cd</span> <span style="color:#a6e22e">myblog</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">mkdir</span> <span style="color:#a6e22e">content</span>/posts   <span style="color:#a6e22e">#</span> <span style="color:#a6e22e">本句仅需运行一次</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>cd myblog
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 本句仅需运行一次</span>
+</span></span><span style="display:flex;"><span>mkdir content/posts
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">#</span> <span style="color:#a6e22e">如果是</span> <span style="color:#a6e22e">Windows，请在</span> <span style="color:#a6e22e">PowerShell</span> <span style="color:#a6e22e">中执行此语句创建内容</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">New-Item</span> <span style="color:#a6e22e">-Type</span> <span style="color:#a6e22e">file</span> <span style="color:#a6e22e">content</span>/posts/my-first-post.md
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 如果是 Windows，请在 PowerShell 中执行此语句创建内容</span>
+</span></span><span style="display:flex;"><span>New-Item -Type file content/posts/my-first-post.md
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">#</span> <span style="color:#a6e22e">如果是</span> <span style="color:#a6e22e">macOS</span> <span style="color:#a6e22e">系统，执行此语句创建内容</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">touch</span> <span style="color:#a6e22e">content</span>/posts/my-first-post.md
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 如果是 macOS 系统，执行此语句创建内容</span>
+</span></span><span style="display:flex;"><span>touch content/posts/my-first-post.md
 </span></span></code></pre></div><p>接下来再用喜欢的编辑器编辑新创建的 Markdown 文件即可。hugo 支持在 Markdown 顶部声明一些文章的基本信息，比如标题、创建时间等。下面就是一篇文章的 Markdown 内容示例：</p>
-<pre tabindex="0"><code>---
-title: &#34;文章的标题&#34;
-date: 2018-08-31T18:35:00+08:00
-draft: false
-categories: [&#34;Software Project&#34; ]
-tags: [&#34;博客&#34;, &#34;网站&#34;, &#34;hugo&#34; ]
-isCJKLanguage: true
----
-
-在最前面的基本信息之后的所有内容，都是文章的正文部分。正文部分支持使用 Markdown 语法。比如可以[添加外链](https://github.com/)，以及**加粗文字**等。
-</code></pre><p>可以去 hugo 的网站了解更多<a
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>title: <span style="color:#e6db74">&#34;文章的标题&#34;</span>
+</span></span><span style="display:flex;"><span>date: 2018-08-31T18:35:00+08:00
+</span></span><span style="display:flex;"><span>draft: false
+</span></span><span style="display:flex;"><span>categories: <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;Software Project&#34;</span> <span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>tags: <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;博客&#34;</span>, <span style="color:#e6db74">&#34;网站&#34;</span>, <span style="color:#e6db74">&#34;hugo&#34;</span> <span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>isCJKLanguage: true
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>在最前面的基本信息之后的所有内容，都是文章的正文部分。正文部分支持使用 Markdown 语法。比如可以<span style="color:#f92672">[</span>添加外链<span style="color:#f92672">](</span>https://github.com/<span style="color:#f92672">)</span>，以及**加粗文字**等。
+</span></span></code></pre></div><p>可以去 hugo 的网站了解更多<a
   class="gblog-markdown__link"
   href="https://gohugo.io/content-management/front-matter/"
 >页面基本信息</a>和<a
@@ -491,11 +565,11 @@ isCJKLanguage: true
 <p>上面我们创建的内容是<code>博客文章</code>的类型，这种内容一经创建就会自动出现在网站首页的最新文章列表中。除此之外，我们还可以创建一些不被统计入目录的<code>页面</code>。只需要在上面创建内容文件时，指定目录为 <code>content/pages</code> 开头即可，而页面的内容仍然是以 Markdown 格式描述的。</p>
 <p>如果需要在文章中插入图片、音视频等多媒体资源，可以在网站目录下的 <code>static</code> 下创建一个专用的目录（如 <code>static/assets</code>）。在需要往文章中插入图片时，只需要把图片放在这个目录中，并且在 Markdown 中插入相对路径即可（不包含 <code>static</code> 前缀）。</p>
 <p>在文章编辑期间，可以执行 <code>hugo server</code> 命令在本地启动预览，然后在浏览器中打开新创建的文章，能即时查看文章的效果。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ps" data-lang="ps"><span style="display:flex;"><span><span style="color:#a6e22e">mkdir</span> <span style="color:#a6e22e">static</span>/assets
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">cp</span> /path/to/image.jpg <span style="color:#a6e22e">static</span>/assets<span style="color:#960050;background-color:#1e0010">/</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>mkdir static/assets
+</span></span><span style="display:flex;"><span>cp /path/to/image.jpg static/assets/
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">#</span> <span style="color:#a6e22e">在</span> <span style="color:#a6e22e">Markdown</span> <span style="color:#a6e22e">中插入图片：（正文图片链接）</span><span style="color:#e6db74">(大图链接)</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">#</span> [<span style="color:#a6e22e">!</span>[<span style="color:#a6e22e">图片标题</span>]<span style="color:#e6db74">(/assets/image.jpg &#34;图片标题&#34;)</span>]<span style="color:#e6db74">(/assets/image.jpg)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 在 Markdown 中插入图片：（正文图片链接）(大图链接)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [![图片标题](/assets/image.jpg &#34;图片标题&#34;)](/assets/image.jpg)</span>
 </span></span></code></pre></div><!-- raw HTML omitted -->
 <div class="flex align-center gblog-post__anchorwrap">
     <h2 id="发布你的网站"
@@ -537,20 +611,87 @@ isCJKLanguage: true
 <li>将最新的网站推送到 GitHub 服务器上</li>
 </ol>
 <p>对应的命令行指令是：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ps" data-lang="ps"><span style="display:flex;"><span><span style="color:#a6e22e">cd</span> <span style="color:#a6e22e">myblog</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">hugo</span> <span style="color:#a6e22e">-t</span> <span style="color:#a6e22e">hyde</span>  <span style="color:#a6e22e">#</span> <span style="color:#a6e22e">注意，把最后一个参数换成你的主题的名字</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>cd myblog
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 注意，把最后一个参数换成你的主题的名字</span>
+</span></span><span style="display:flex;"><span>hugo -t hyde
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">cd</span> <span style="color:#a6e22e">public</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">#</span> <span style="color:#a6e22e">choco</span> <span style="color:#a6e22e">install</span> <span style="color:#a6e22e">git</span>  <span style="color:#a6e22e">#</span> <span style="color:#a6e22e">在</span> <span style="color:#a6e22e">Windows</span> <span style="color:#a6e22e">上，如果还没有安装</span> <span style="color:#a6e22e">Git</span> <span style="color:#a6e22e">的话，请执行此句来安装</span> <span style="color:#a6e22e">Git</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">git</span> <span style="color:#a6e22e">init</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">git</span> <span style="color:#a6e22e">remote</span> <span style="color:#a6e22e">add</span> <span style="color:#a6e22e">origin</span> <span style="color:#a6e22e">https:</span><span style="color:#960050;background-color:#1e0010">/</span>/github.com/user-name/user-name.github.io.git   <span style="color:#a6e22e">#</span> <span style="color:#a6e22e">注意，把其中的</span> <span style="color:#a6e22e">user-name</span> <span style="color:#a6e22e">换成你的</span> <span style="color:#a6e22e">GitHub</span> <span style="color:#a6e22e">用户名</span>
+</span></span><span style="display:flex;"><span>cd public
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># choco install git  # 在 Windows 上，如果还没有安装 Git 的话，请执行此句来安装 Git</span>
+</span></span><span style="display:flex;"><span>git init
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 注意，把其中的 user-name 换成你的 GitHub 用户名</span>
+</span></span><span style="display:flex;"><span>git remote add origin https://github.com/user-name/user-name.github.io.git
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">git</span> <span style="color:#a6e22e">add</span> <span style="color:#a6e22e">--all</span> 
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">git</span> <span style="color:#a6e22e">commit</span> <span style="color:#a6e22e">-m</span> <span style="color:#a6e22e">&#34;Publishing</span> <span style="color:#a6e22e">to</span> <span style="color:#a6e22e">gh-pages&#34;</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">git</span> <span style="color:#a6e22e">push</span> <span style="color:#a6e22e">origin</span> <span style="color:#a6e22e">master</span> <span style="color:#a6e22e">--set-upstream</span>  <span style="color:#a6e22e">#</span> <span style="color:#a6e22e">你会被询问</span> <span style="color:#a6e22e">GitHub</span> <span style="color:#a6e22e">用户名和密码</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">#</span> <span style="color:#a6e22e">发布完成，回到上层目录（可以继续写作啦）</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">cd</span> <span style="color:#a6e22e">..</span>
+</span></span><span style="display:flex;"><span>git add --all 
+</span></span><span style="display:flex;"><span>git commit -m <span style="color:#e6db74">&#34;Publishing to gh-pages&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 你会被询问 GitHub 用户名和密码，目前git不支持直接使用用户名和密码登录，需要使用git credential-manager来管理</span>
+</span></span><span style="display:flex;"><span>git push origin master --set-upstream  
+</span></span></code></pre></div><div class="flex align-center gblog-post__anchorwrap">
+    <h3 id="安装和启用credential-manager"
+    >
+        安装和启用credential-manager
+    </h3>
+    <a data-clipboard-text="http://localhost:1313/posts/howtouse/#安装和启用credential-manager" class="gblog-post__anchor clip flex align-center" aria-label="Anchor 安装和启用credential-manager" href="#%e5%ae%89%e8%a3%85%e5%92%8c%e5%90%af%e7%94%a8credential-manager">
+        <svg class="gblog-icon gblog_link"><use xlink:href="#gblog_link"></use></svg>
+    </a>
+</div>
+<div class="flex align-center gblog-post__anchorwrap">
+    <h4 id="windows"
+    >
+        Windows
+    </h4>
+    <a data-clipboard-text="http://localhost:1313/posts/howtouse/#windows" class="gblog-post__anchor clip flex align-center" aria-label="Anchor Windows" href="#windows">
+        <svg class="gblog-icon gblog_link"><use xlink:href="#gblog_link"></use></svg>
+    </a>
+</div>
+<p>GCM 已包含在 Git for Windows 2.29+ 版本中。如果没有，可以运行：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>git credential-manager install
+</span></span></code></pre></div><div class="flex align-center gblog-post__anchorwrap">
+    <h4 id="linux--macos"
+    >
+        Linux &amp; macOS
+    </h4>
+    <a data-clipboard-text="http://localhost:1313/posts/howtouse/#linux--macos" class="gblog-post__anchor clip flex align-center" aria-label="Anchor Linux &amp; macOS" href="#linux--macos">
+        <svg class="gblog-icon gblog_link"><use xlink:href="#gblog_link"></use></svg>
+    </a>
+</div>
+<p>使用 Homebrew 安装：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>brew install git-credential-manager
+</span></span></code></pre></div><p>或者使用 apt（Ubuntu/Debian）：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>sudo apt install git-credential-manager
+</span></span></code></pre></div><div class="flex align-center gblog-post__anchorwrap">
+    <h3 id="启用credential-manager"
+    >
+        启用credential-manager
+    </h3>
+    <a data-clipboard-text="http://localhost:1313/posts/howtouse/#启用credential-manager" class="gblog-post__anchor clip flex align-center" aria-label="Anchor 启用credential-manager" href="#%e5%90%af%e7%94%a8credential-manager">
+        <svg class="gblog-icon gblog_link"><use xlink:href="#gblog_link"></use></svg>
+    </a>
+</div>
+<div class="flex align-center gblog-post__anchorwrap">
+    <h4 id="windows-1"
+    >
+        windows
+    </h4>
+    <a data-clipboard-text="http://localhost:1313/posts/howtouse/#windows-1" class="gblog-post__anchor clip flex align-center" aria-label="Anchor windows" href="#windows-1">
+        <svg class="gblog-icon gblog_link"><use xlink:href="#gblog_link"></use></svg>
+    </a>
+</div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>git config --global credential.helper manager --add
+</span></span></code></pre></div><div class="flex align-center gblog-post__anchorwrap">
+    <h4 id="linuxmac"
+    >
+        Linux&amp;&amp;Mac
+    </h4>
+    <a data-clipboard-text="http://localhost:1313/posts/howtouse/#linuxmac" class="gblog-post__anchor clip flex align-center" aria-label="Anchor Linux&amp;&amp;Mac" href="#linuxmac">
+        <svg class="gblog-icon gblog_link"><use xlink:href="#gblog_link"></use></svg>
+    </a>
+</div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>git config --global credential.helper manager-core --add
+</span></span></code></pre></div><p>然后再执行</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>git push origin master --set-upstream 
+</span></span></code></pre></div><p>此时会弹出询问页面，使用浏览器登录并储存token即可</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#75715e"># 发布完成，回到上层目录（可以继续写作啦）</span>
+</span></span><span style="display:flex;"><span>cd ..
 </span></span></code></pre></div><p>如果一切顺利、推送完成之后，稍等片刻，就可以从公网访问你的网站了：http://user-name.github.io 接下来你就可以与朋友们分享你的新网站了。每次发布网站时都需要输入这一系列的命令，显得很繁琐。可以<a
   class="gblog-markdown__link"
   href="/assets/howtouse/publish.bat"
