@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on My New Hugo Site</title>
+    <link>http://localhost:1313/posts/</link>
+    <description>Recent content in Posts on My New Hugo Site</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title></title>
+      <link>http://localhost:1313/posts/howtouse/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/howtouse/</guid>
+      <description>&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;&#xA;    &lt;h1 id=&#34;免费搭建一个静态博客&#34;&#xA;    &gt;&#xA;        免费搭建一个静态博客&#xA;    &lt;/h1&gt;&#xA;    &lt;a data-clipboard-text=&#34;http://localhost:1313/posts/howtouse/#免费搭建一个静态博客&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor 免费搭建一个静态博客&#34; href=&#34;#%e5%85%8d%e8%b4%b9%e6%90%ad%e5%bb%ba%e4%b8%80%e4%b8%aa%e9%9d%99%e6%80%81%e5%8d%9a%e5%ae%a2&#34;&gt;&#xA;        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;&#xA;    &lt;/a&gt;&#xA;&lt;/div&gt;&#xA;&lt;p&gt;独立博客表面上是网站，但实际上我们作为内容的创作者，需要关注的只是它的内容——我们以后会经常更新的只是内容的部分。一个博客网站可以分为这几个部分：&lt;/p&gt;&#xA;&lt;p&gt;&lt;img&#xA;  src=&#34;http://localhost:1313/mytreehole/assets/howtouse/blog-site.png&#34;&#xA;  alt=&#34;这是图片&#34;&#xA;  title=&#34;title&#34;&#xA;/&gt;&lt;/p&gt;&#xA;&lt;p&gt;最常见的博客系统 WordPress 是一款动态博客系统（PHP 程序），这类系统需要在云主机商（如阿里云）那里买专门的空间或来存储和发布（存储并运行 PHP 程序）我们的博客网站。&lt;/p&gt;&#xA;&lt;!-- raw HTML omitted --&gt;&#xA;&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;&#xA;    &lt;h2 id=&#34;静态博客系统&#34;&#xA;    &gt;&#xA;        静态博客系统&#xA;    &lt;/h2&gt;&#xA;    &lt;a data-clipboard-text=&#34;http://localhost:1313/posts/howtouse/#静态博客系统&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor 静态博客系统&#34; href=&#34;#%e9%9d%99%e6%80%81%e5%8d%9a%e5%ae%a2%e7%b3%bb%e7%bb%9f&#34;&gt;&#xA;        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;&#xA;    &lt;/a&gt;&#xA;&lt;/div&gt;&#xA;&lt;p&gt;所谓静态博客系统指的是，博客网站是由一系列的静态 HTML 文件，以及对应的多媒体素材等组成，只要找一个可以存储文件的平台即可发布网站。有许多工具，可以把一篇篇博客文章的 Markdown 文件，配上博客主题之后转换为可以直接发布的 HTML 文件。&lt;/p&gt;&#xA;&lt;!-- raw HTML omitted --&gt;&#xA;&lt;p&gt;静态博客系统的原理，就如同这篇教程，我创作时，写的是 Markdown 文件（&lt;a&#xA;  class=&#34;gblog-markdown__link&#34;&#xA;  href=&#34;https://raw.githubusercontent.com/jijiechen/static-blog-manual/master/readme.md&#34;&#xA;&gt;readme.md&lt;/a&gt;），但你看到的确实是带有格式和交互的网页。因为这背后，有 GitHub 在帮我完成了从静态 Markdown 到静态 HTML 的转换。&lt;/p&gt;&#xA;&lt;p&gt;如果要搭建一个静态博客网站，我们需要的工具有：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;把 Markdown 转化为 HTML 的工具（即静态网站生成工具）&lt;/li&gt;&#xA;&lt;li&gt;博客样式主题（通常与工具是配套的，一般来说找到了生成工具就找到了主题）&lt;/li&gt;&#xA;&lt;li&gt;能存储和发布静态文件的平台&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;常用的静态网站生成工具有 &lt;a&#xA;  class=&#34;gblog-markdown__link&#34;&#xA;  href=&#34;https://jekyllrb.com/&#34;&#xA;&gt;jekyll&lt;/a&gt;, &lt;a&#xA;  class=&#34;gblog-markdown__link&#34;&#xA;  href=&#34;https://hexo.io/&#34;&#xA;&gt;hexo&lt;/a&gt; 和 &lt;a&#xA;  class=&#34;gblog-markdown__link&#34;&#xA;  href=&#34;https://gohugo.io/&#34;&#xA;&gt;hugo&lt;/a&gt; 等。接下来，我以 hugo 的使用为例介绍如何搭建一个静态博客网站。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
