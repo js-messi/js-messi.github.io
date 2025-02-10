@@ -11,9 +11,11 @@
 <meta name="referrer" content="no-referrer" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="generator" content="Hugo 0.143.1">
-  <meta name="robots" content="noindex, nofollow" />
+  <meta name="robots" content="index, follow" />
+  <meta name="description" content=" 基于Python3写的抓取gcp防火墙信息 拉取gcp防火墙信息 需要调用到基础接口脚本里的数据库读写和boto3库
+from google.cloud import compute _v1 from google.oauth2 import service_account from BasicInterfaces import executeMysqlData import time def queryFirewallRule(credentials,projectId): dictFirewallDetails = {} client = compute_v1.FirewallsClient(credentials= credentials) try: firewallRuleList = client. list(project=projectId) except: print (f&#39;发现没有权限读取配置的 project&#39;) dictFirewallDetails = {&#34;projectid&#34;:{&#34;rights&#34;:&#34;no&#34;}} return dictFirewallDetails portList = [] for firewallName in firewallRuleList: if &#34;0.0.0.0&#34; in firewallName.source_ranges or &#34;0.0.0.0/0&#34; in firewallName.source_ranges: print (f&#39;发现存在any的规则!规则名为{firewallName.name}&#39;) if len(firewallName.allowed)!= 0: action = &#39;allow&#39; for context in firewallName.allowed: for port in context.ports: portList.append(port) protocol = context.I_p_protocol elif len(firewallName. denied) != 0: action = &#39;deny&#39; for context in firewallName.denied: for port in context.ports: portList.append(port) protocol = context.I_p_protocol portStr = &#39;,&#39;.join(portList) dictFirewallDetails[firewallName.name] = { &#34;direction&#34;:firewallName.direction, &#34;action&#34;: action, &#34;port&#34;:portStr, &#34;protocol&#34;: protocol } portList = [] return dictFirewallDetails project_ids = {&#34;&lt;项目显示名称&gt;&#34;:&#34;&lt;项目实际名称&gt;&#34;} credentials = service_account.Credentials.from_service_account_file(&#39;&lt;xxxx.json&gt;&#39;) for i in project_ids: print (f&#39;开始扫描 project:{i}&#39;) result = queryFirewallRule(credentials, project_ids[i]) for ruleName in result: if &#39;rights&#39; not in result[ruleName]: sql= f&#34;&#34;&#34;INSERT INTO gcpfirewall (project, rulename, action, direction, protocol, ports, cloud) VALUES ({&#34;&#39;&#34; &#43; i &#43; &#34;&#39;&#34;},{&#34;&#39;&#34; &#43; ruleName &#43; &#34;&#39;&#34;},{&#34;&#39;&#34; &#43; result[ruleName][&#39;action&#39;] &#43; &#34;&#39;&#34;},{&#34;&#39;&#34; &#43;result[ruleName][&#39;port&#39;][0:280] &#43; &#34;&#39;&#34;},&#39;GCP&#39;)&#34;&#34;&#34; else: sql= f&#34;&#34;&#34;INSERT INTO gcpfirewall (project, rulename, cloud) VALUES({&#34;&#39;&#34; &#43; i &#43; &#34;&#39;&#34;},&#39;unknown&#39;,&#39;GCP&#39;)&#34;&#34;&#34; executeMysqlData(1,&#39;write&#39;, sql) " />
 
-    <title>Categories | MyTreeHoles</title>
+    <title>gcp防火墙信息抓取 | MyTreeHoles</title>
 
     <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg" />
 <link
@@ -34,19 +36,67 @@
     
   <meta
     property="og:title"
-    content="Categories"
+    content="gcp防火墙信息抓取"
   />
   <meta property="og:site_name" content="MyTreeHoles" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="http://localhost:1313/categories/" />
+  <meta property="og:description" content=" 基于Python3写的抓取gcp防火墙信息 拉取gcp防火墙信息 需要调用到基础接口脚本里的数据库读写和boto3库
+from google.cloud import compute _v1 from google.oauth2 import service_account from BasicInterfaces import executeMysqlData import time def queryFirewallRule(credentials,projectId): dictFirewallDetails = {} client = compute_v1.FirewallsClient(credentials= credentials) try: firewallRuleList = client. list(project=projectId) except: print (f&#39;发现没有权限读取配置的 project&#39;) dictFirewallDetails = {&#34;projectid&#34;:{&#34;rights&#34;:&#34;no&#34;}} return dictFirewallDetails portList = [] for firewallName in firewallRuleList: if &#34;0.0.0.0&#34; in firewallName.source_ranges or &#34;0.0.0.0/0&#34; in firewallName.source_ranges: print (f&#39;发现存在any的规则!规则名为{firewallName.name}&#39;) if len(firewallName.allowed)!= 0: action = &#39;allow&#39; for context in firewallName.allowed: for port in context.ports: portList.append(port) protocol = context.I_p_protocol elif len(firewallName. denied) != 0: action = &#39;deny&#39; for context in firewallName.denied: for port in context.ports: portList.append(port) protocol = context.I_p_protocol portStr = &#39;,&#39;.join(portList) dictFirewallDetails[firewallName.name] = { &#34;direction&#34;:firewallName.direction, &#34;action&#34;: action, &#34;port&#34;:portStr, &#34;protocol&#34;: protocol } portList = [] return dictFirewallDetails project_ids = {&#34;&lt;项目显示名称&gt;&#34;:&#34;&lt;项目实际名称&gt;&#34;} credentials = service_account.Credentials.from_service_account_file(&#39;&lt;xxxx.json&gt;&#39;) for i in project_ids: print (f&#39;开始扫描 project:{i}&#39;) result = queryFirewallRule(credentials, project_ids[i]) for ruleName in result: if &#39;rights&#39; not in result[ruleName]: sql= f&#34;&#34;&#34;INSERT INTO gcpfirewall (project, rulename, action, direction, protocol, ports, cloud) VALUES ({&#34;&#39;&#34; &#43; i &#43; &#34;&#39;&#34;},{&#34;&#39;&#34; &#43; ruleName &#43; &#34;&#39;&#34;},{&#34;&#39;&#34; &#43; result[ruleName][&#39;action&#39;] &#43; &#34;&#39;&#34;},{&#34;&#39;&#34; &#43;result[ruleName][&#39;port&#39;][0:280] &#43; &#34;&#39;&#34;},&#39;GCP&#39;)&#34;&#34;&#34; else: sql= f&#34;&#34;&#34;INSERT INTO gcpfirewall (project, rulename, cloud) VALUES({&#34;&#39;&#34; &#43; i &#43; &#34;&#39;&#34;},&#39;unknown&#39;,&#39;GCP&#39;)&#34;&#34;&#34; executeMysqlData(1,&#39;write&#39;, sql) " />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/posts/getgcpfirewallpolicy/" />
 
-
+<meta property="article:section" content="Posts" />
+    <meta
+      property="article:published_time"
+      content="2025-02-10T10:00:00+08:00"
+    />
+    <meta
+      property="article:modified_time"
+      content="2025-02-10T10:00:00+08:00"
+    />
 
 
   <meta name="twitter:card" content="summary" />
-<meta name="twitter:title" content="Categories" />
+<meta name="twitter:title" content="gcp防火墙信息抓取" />
+  <meta name="twitter:description" content=" 基于Python3写的抓取gcp防火墙信息 拉取gcp防火墙信息 需要调用到基础接口脚本里的数据库读写和boto3库
+from google.cloud import compute _v1 from google.oauth2 import service_account from BasicInterfaces import executeMysqlData import time def queryFirewallRule(credentials,projectId): dictFirewallDetails = {} client = compute_v1.FirewallsClient(credentials= credentials) try: firewallRuleList = client. list(project=projectId) except: print (f&#39;发现没有权限读取配置的 project&#39;) dictFirewallDetails = {&#34;projectid&#34;:{&#34;rights&#34;:&#34;no&#34;}} return dictFirewallDetails portList = [] for firewallName in firewallRuleList: if &#34;0.0.0.0&#34; in firewallName.source_ranges or &#34;0.0.0.0/0&#34; in firewallName.source_ranges: print (f&#39;发现存在any的规则!规则名为{firewallName.name}&#39;) if len(firewallName.allowed)!= 0: action = &#39;allow&#39; for context in firewallName.allowed: for port in context.ports: portList.append(port) protocol = context.I_p_protocol elif len(firewallName. denied) != 0: action = &#39;deny&#39; for context in firewallName.denied: for port in context.ports: portList.append(port) protocol = context.I_p_protocol portStr = &#39;,&#39;.join(portList) dictFirewallDetails[firewallName.name] = { &#34;direction&#34;:firewallName.direction, &#34;action&#34;: action, &#34;port&#34;:portStr, &#34;protocol&#34;: protocol } portList = [] return dictFirewallDetails project_ids = {&#34;&lt;项目显示名称&gt;&#34;:&#34;&lt;项目实际名称&gt;&#34;} credentials = service_account.Credentials.from_service_account_file(&#39;&lt;xxxx.json&gt;&#39;) for i in project_ids: print (f&#39;开始扫描 project:{i}&#39;) result = queryFirewallRule(credentials, project_ids[i]) for ruleName in result: if &#39;rights&#39; not in result[ruleName]: sql= f&#34;&#34;&#34;INSERT INTO gcpfirewall (project, rulename, action, direction, protocol, ports, cloud) VALUES ({&#34;&#39;&#34; &#43; i &#43; &#34;&#39;&#34;},{&#34;&#39;&#34; &#43; ruleName &#43; &#34;&#39;&#34;},{&#34;&#39;&#34; &#43; result[ruleName][&#39;action&#39;] &#43; &#34;&#39;&#34;},{&#34;&#39;&#34; &#43;result[ruleName][&#39;port&#39;][0:280] &#43; &#34;&#39;&#34;},&#39;GCP&#39;)&#34;&#34;&#34; else: sql= f&#34;&#34;&#34;INSERT INTO gcpfirewall (project, rulename, cloud) VALUES({&#34;&#39;&#34; &#43; i &#43; &#34;&#39;&#34;},&#39;unknown&#39;,&#39;GCP&#39;)&#34;&#34;&#34; executeMysqlData(1,&#39;write&#39;, sql) " />
 
-
+<script type="application/ld+json">
+  {
+      "@context": "http://schema.org",
+      "@type": "BlogPosting",
+      "articleSection": "Posts",
+      "name": "gcp防火墙信息抓取",
+      "url" : "http://localhost:1313/posts/getgcpfirewallpolicy/",
+      "headline": "gcp防火墙信息抓取",
+      "description": " 基于Python3写的抓取gcp防火墙信息 拉取gcp防火墙信息 需要调用到基础接口脚本里的数据库读写和boto3库\nfrom google.cloud import compute _v1 from google.oauth2 import service_account from BasicInterfaces import executeMysqlData import time def queryFirewallRule(credentials,projectId): dictFirewallDetails = {} client = compute_v1.FirewallsClient(credentials= credentials) try: firewallRuleList = client. list(project=projectId) except: print (f\u0027发现没有权限读取配置的 project\u0027) dictFirewallDetails = {\u0022projectid\u0022:{\u0022rights\u0022:\u0022no\u0022}} return dictFirewallDetails portList = [] for firewallName in firewallRuleList: if \u00220.0.0.0\u0022 in firewallName.source_ranges or \u00220.0.0.0\/0\u0022 in firewallName.source_ranges: print (f\u0027发现存在any的规则!规则名为{firewallName.name}\u0027) if len(firewallName.allowed)!= 0: action = \u0027allow\u0027 for context in firewallName.allowed: for port in context.ports: portList.append(port) protocol = context.I_p_protocol elif len(firewallName. denied) != 0: action = \u0027deny\u0027 for context in firewallName.denied: for port in context.ports: portList.append(port) protocol = context.I_p_protocol portStr = \u0027,\u0027.join(portList) dictFirewallDetails[firewallName.name] = { \u0022direction\u0022:firewallName.direction, \u0022action\u0022: action, \u0022port\u0022:portStr, \u0022protocol\u0022: protocol } portList = [] return dictFirewallDetails project_ids = {\u0022\u003c项目显示名称\u003e\u0022:\u0022\u003c项目实际名称\u003e\u0022} credentials = service_account.Credentials.from_service_account_file(\u0027\u003cxxxx.json\u003e\u0027) for i in project_ids: print (f\u0027开始扫描 project:{i}\u0027) result = queryFirewallRule(credentials, project_ids[i]) for ruleName in result: if \u0027rights\u0027 not in result[ruleName]: sql= f\u0022\u0022\u0022INSERT INTO gcpfirewall (project, rulename, action, direction, protocol, ports, cloud) VALUES ({\u0022\u0027\u0022 \u002b i \u002b \u0022\u0027\u0022},{\u0022\u0027\u0022 \u002b ruleName \u002b \u0022\u0027\u0022},{\u0022\u0027\u0022 \u002b result[ruleName][\u0027action\u0027] \u002b \u0022\u0027\u0022},{\u0022\u0027\u0022 \u002bresult[ruleName][\u0027port\u0027][0:280] \u002b \u0022\u0027\u0022},\u0027GCP\u0027)\u0022\u0022\u0022 else: sql= f\u0022\u0022\u0022INSERT INTO gcpfirewall (project, rulename, cloud) VALUES({\u0022\u0027\u0022 \u002b i \u002b \u0022\u0027\u0022},\u0027unknown\u0027,\u0027GCP\u0027)\u0022\u0022\u0022 executeMysqlData(1,\u0027write\u0027, sql) ",
+      "wordCount" : "183",
+      "inLanguage": "en",
+      "isFamilyFriendly": "true",
+      "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "http://localhost:1313/posts/getgcpfirewallpolicy/"
+      },
+      "keywords" : [ "Python" ],
+      "author" : [
+      ],
+      "copyrightHolder" : "MyTreeHoles",
+      "copyrightYear" : "2025",
+      "dateCreated": "2025-02-10T10:00:00.00Z",
+      "datePublished": "2025-02-10T10:00:00.00Z",
+      "dateModified": "2025-02-10T10:00:00.00Z",
+      "publisher":{
+          "@type":"Organization",
+          "name": "MyTreeHoles",
+          "url": "http://localhost:1313/",
+          "logo": {
+              "@type": "ImageObject",
+              "url": "http://localhost:1313/brand.svg",
+              "width":"32",
+              "height":"32"
+          }
+      }
+  }
+  </script>
 
 
     
@@ -118,7 +168,7 @@
   href="/custom.css"
   media="all"
 />
-  <link href="http://localhost:1313/categories/" rel="canonical" type="text/html" />
+  <link href="http://localhost:1313/posts/getgcpfirewallpolicy/" rel="canonical" type="text/html" />
     <link href="http://localhost:1313/index.xml" rel="alternate" type="application/rss+xml" title="MyTreeHoles rss Feed" />
 
 <!-- Made with Geekblog theme https://github.com/thegeeklab/hugo-geekblog -->
@@ -227,85 +277,133 @@
 
       <main class="gblog-page container">
         
+  <article class="gblog-post">
+    <header class="gblog-post__header">
+      
+      
+
+
+      <h1 class="gblog-post__title">gcp防火墙信息抓取</h1>
+
+      
+        <div class="flex flex-wrap align-center gblog-post__meta gblog-post__meta--head">
+          <span class="flex align-center no-wrap gblog-post__meta--update">
+  <svg class="gblog-icon gblog_date"><use xlink:href="#gblog_date"></use></svg>
+  <span class="gblog-post__tag">
+    <time datetime="2025-02-10T10:00:00&#43;08:00">
+      
+      Feb 10, 2025
+    </time>
+  </span>
+</span>
+
+<span class="flex align-center no-wrap gblog-post__meta--readtime">
+  <svg class="gblog-icon gblog_timer"><use xlink:href="#gblog_timer"></use></svg>
+  <span class="gblog-post__tag">1 min read</span>
+</span>
+
+
+
+
+
+
+
+
   
-  
-    <article class="gblog-post">
-      <header class="gblog-post__header">
-        <h1 class="gblog-post__title">
-          <a href="/categories/%E5%8D%9A%E5%AE%A2%E7%9B%B8%E5%85%B3/">博客相关</a>
-        </h1>
-      </header>
-
-      <footer class="gblog-post__meta flex align-center">
-        <span class="flex align-center no-wrap">
-          
-          <svg class="gblog-icon gblog_tag"><use xlink:href="#gblog_tag"></use></svg>
-          <span class="gblog-post__tag">
-            1
-            post
-          </span>
-        </span>
-
-        <span class="flex align-center no-wrap">
-          <svg class="gblog-icon gblog_star"><use xlink:href="#gblog_star"></use></svg>
-          <span>
-            
-            
-              <a href="/posts/howtouse/">如何使用Hugo搭建自己的静态博客</a>
-            
-            <i>by</i>
-            
-            
-          </span>
-        </span>
-      </footer>
-    </article>
-  
-    <article class="gblog-post">
-      <header class="gblog-post__header">
-        <h1 class="gblog-post__title">
-          <a href="/categories/%E8%84%9A%E6%9C%AC%E7%9B%B8%E5%85%B3/">脚本相关</a>
-        </h1>
-      </header>
-
-      <footer class="gblog-post__meta flex align-center">
-        <span class="flex align-center no-wrap">
-          
-          <svg class="gblog-icon gblog_tag"><use xlink:href="#gblog_tag"></use></svg>
-          <span class="gblog-post__tag">
-            10
-            posts
-          </span>
-        </span>
-
-        <span class="flex align-center no-wrap">
-          <svg class="gblog-icon gblog_star"><use xlink:href="#gblog_star"></use></svg>
-          <span>
-            
-            
-              <a href="/posts/basicinterface/">基础接口脚本</a>
-            
-            <i>by</i>
-            
-            
-          </span>
-        </span>
-      </footer>
-    </article>
-  
-  
-
-
-<nav class="gblog-paging flex flex-even align-center" role="navigation">
-  <div class="gblog-paging__item gblog-paging__item--prev">
     
-  </div>
-  <div class="gblog-paging__state">Page 1 of 1</div>
-  <div class="gblog-paging__item gblog-paging__item--next">
     
-  </div>
-</nav>
+      
+        <span class="flex align-center no-wrap gblog-post__meta--tag">
+          <svg class="gblog-icon gblog_bookmark"><use xlink:href="#gblog_bookmark"></use></svg>
+          
+  <span class="gblog-post__tag gblog-button gblog-button--regular">
+    <a
+      class="gblog-button__link"
+      href="/tags/python/"
+      title="All posts tagged with 'Python'"
+    >
+      Python
+    </a>
+  </span>
 
+        </span>
+      
+    
+    
+  
+
+
+
+
+
+
+        </div>
+      
+    </header>
+    <section class="gblog-markdown">
+      <div class="flex align-center gblog-post__anchorwrap">
+    <h1 id="基于python3写的抓取gcp防火墙信息"
+    >
+        基于Python3写的抓取gcp防火墙信息
+    </h1>
+    <a data-clipboard-text="http://localhost:1313/posts/getgcpfirewallpolicy/#基于python3写的抓取gcp防火墙信息" class="gblog-post__anchor clip flex align-center" aria-label="Anchor 基于Python3写的抓取gcp防火墙信息" href="#%e5%9f%ba%e4%ba%8epython3%e5%86%99%e7%9a%84%e6%8a%93%e5%8f%96gcp%e9%98%b2%e7%81%ab%e5%a2%99%e4%bf%a1%e6%81%af">
+        <svg class="gblog-icon gblog_link"><use xlink:href="#gblog_link"></use></svg>
+    </a>
+</div>
+<p>拉取gcp防火墙信息
+需要调用到基础接口脚本里的数据库读写和boto3库</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> google.cloud <span style="color:#f92672">import</span> compute _v1
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> google.oauth2 <span style="color:#f92672">import</span> service_account
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> BasicInterfaces <span style="color:#f92672">import</span> executeMysqlData
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">queryFirewallRule</span>(credentials,projectId):
+</span></span><span style="display:flex;"><span>    dictFirewallDetails <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>    client <span style="color:#f92672">=</span> compute_v1<span style="color:#f92672">.</span>FirewallsClient(credentials<span style="color:#f92672">=</span> credentials)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        firewallRuleList <span style="color:#f92672">=</span> client<span style="color:#f92672">.</span> list(project<span style="color:#f92672">=</span>projectId)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span>:
+</span></span><span style="display:flex;"><span>        print (<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;发现没有权限读取配置的 project&#39;</span>)
+</span></span><span style="display:flex;"><span>        dictFirewallDetails <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;projectid&#34;</span>:{<span style="color:#e6db74">&#34;rights&#34;</span>:<span style="color:#e6db74">&#34;no&#34;</span>}}
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> dictFirewallDetails
+</span></span><span style="display:flex;"><span>    portList <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> firewallName <span style="color:#f92672">in</span> firewallRuleList:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;0.0.0.0&#34;</span> <span style="color:#f92672">in</span> firewallName<span style="color:#f92672">.</span>source_ranges <span style="color:#f92672">or</span> <span style="color:#e6db74">&#34;0.0.0.0/0&#34;</span> <span style="color:#f92672">in</span> firewallName<span style="color:#f92672">.</span>source_ranges:
+</span></span><span style="display:flex;"><span>            print (<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;发现存在any的规则!规则名为</span><span style="color:#e6db74">{</span>firewallName<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> len(firewallName<span style="color:#f92672">.</span>allowed)<span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>:
+</span></span><span style="display:flex;"><span>                action <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;allow&#39;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">for</span> context <span style="color:#f92672">in</span> firewallName<span style="color:#f92672">.</span>allowed:
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">for</span> port <span style="color:#f92672">in</span> context<span style="color:#f92672">.</span>ports:
+</span></span><span style="display:flex;"><span>                        portList<span style="color:#f92672">.</span>append(port)
+</span></span><span style="display:flex;"><span>                        protocol <span style="color:#f92672">=</span> context<span style="color:#f92672">.</span>I_p_protocol
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">elif</span> len(firewallName<span style="color:#f92672">.</span> denied) <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>:
+</span></span><span style="display:flex;"><span>                action <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;deny&#39;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">for</span> context <span style="color:#f92672">in</span> firewallName<span style="color:#f92672">.</span>denied:
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">for</span> port <span style="color:#f92672">in</span> context<span style="color:#f92672">.</span>ports:
+</span></span><span style="display:flex;"><span>                        portList<span style="color:#f92672">.</span>append(port)
+</span></span><span style="display:flex;"><span>                        protocol <span style="color:#f92672">=</span> context<span style="color:#f92672">.</span>I_p_protocol
+</span></span><span style="display:flex;"><span>            portStr <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;,&#39;</span><span style="color:#f92672">.</span>join(portList)
+</span></span><span style="display:flex;"><span>            dictFirewallDetails[firewallName<span style="color:#f92672">.</span>name] <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;direction&#34;</span>:firewallName<span style="color:#f92672">.</span>direction, 
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;action&#34;</span>: action,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;port&#34;</span>:portStr,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;protocol&#34;</span>: protocol
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            portList <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> dictFirewallDetails
+</span></span><span style="display:flex;"><span>project_ids <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;&lt;项目显示名称&gt;&#34;</span>:<span style="color:#e6db74">&#34;&lt;项目实际名称&gt;&#34;</span>}
+</span></span><span style="display:flex;"><span>credentials <span style="color:#f92672">=</span> service_account<span style="color:#f92672">.</span>Credentials<span style="color:#f92672">.</span>from_service_account_file(<span style="color:#e6db74">&#39;&lt;xxxx.json&gt;&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> project_ids:
+</span></span><span style="display:flex;"><span>    print (<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;开始扫描 project:</span><span style="color:#e6db74">{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> queryFirewallRule(credentials, project_ids[i])
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> ruleName <span style="color:#f92672">in</span> result:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;rights&#39;</span> <span style="color:#f92672">not</span> <span style="color:#f92672">in</span> result[ruleName]:
+</span></span><span style="display:flex;"><span>            sql<span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;&#34;&#34;INSERT INTO gcpfirewall (project, rulename, action, direction, protocol, ports, cloud) VALUES (</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> i <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> ruleName <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> result[ruleName][<span style="color:#e6db74">&#39;action&#39;</span>] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span>result[ruleName][<span style="color:#e6db74">&#39;port&#39;</span>][<span style="color:#ae81ff">0</span>:<span style="color:#ae81ff">280</span>] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,&#39;GCP&#39;)&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            sql<span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;&#34;&#34;INSERT INTO gcpfirewall (project, rulename, cloud) VALUES(</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> i <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,&#39;unknown&#39;,&#39;GCP&#39;)&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        executeMysqlData(<span style="color:#ae81ff">1</span>,<span style="color:#e6db74">&#39;write&#39;</span>, sql)
+</span></span></code></pre></div>
+    </section>
+  </article>
 
       </main>
 

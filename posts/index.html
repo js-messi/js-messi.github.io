@@ -189,17 +189,6 @@
           <li>
             <a
               class="gblog-nav__entry"
-              href="/tags/hugo/"
-            >
-              Hugo
-            </a>
-          </li>
-        
-      
-        
-          <li>
-            <a
-              class="gblog-nav__entry"
               href="/tags/python/"
             >
               Python
@@ -229,17 +218,6 @@
           </li>
         
       
-        
-          <li>
-            <a
-              class="gblog-nav__entry"
-              href="/tags/%E8%87%AA%E7%94%A8/"
-            >
-              自用
-            </a>
-          </li>
-        
-      
     
     
   </ul>
@@ -257,70 +235,836 @@
     <article class="gblog-post">
       <header class="gblog-post__header">
         <h1 class="gblog-post__title">
-          <a href="/posts/howtouse/">如何使用Hugo搭建自己的静态博客</a>
+          <a href="/posts/getawsiam/">aws IAM信息并判断权限是否开大</a>
         </h1>
       </header>
 
       <section class="gblog-markdown">
         <div class="flex align-center gblog-post__anchorwrap">
-    <h1 id="免费搭建一个静态博客"
+    <h1 id="基于python3写的抓取aws-iam信息并判断权限是否开大"
     >
-        免费搭建一个静态博客
+        基于Python3写的抓取aws IAM信息并判断权限是否开大
     </h1>
-    <a data-clipboard-text="http://localhost:1313/posts/howtouse/#免费搭建一个静态博客" class="gblog-post__anchor clip flex align-center" aria-label="Anchor 免费搭建一个静态博客" href="#%e5%85%8d%e8%b4%b9%e6%90%ad%e5%bb%ba%e4%b8%80%e4%b8%aa%e9%9d%99%e6%80%81%e5%8d%9a%e5%ae%a2">
+    <a data-clipboard-text="http://localhost:1313/posts/getawsiam/#基于python3写的抓取aws-iam信息并判断权限是否开大" class="gblog-post__anchor clip flex align-center" aria-label="Anchor 基于Python3写的抓取aws IAM信息并判断权限是否开大" href="#%e5%9f%ba%e4%ba%8epython3%e5%86%99%e7%9a%84%e6%8a%93%e5%8f%96aws-iam%e4%bf%a1%e6%81%af%e5%b9%b6%e5%88%a4%e6%96%ad%e6%9d%83%e9%99%90%e6%98%af%e5%90%a6%e5%bc%80%e5%a4%a7">
         <svg class="gblog-icon gblog_link"><use xlink:href="#gblog_link"></use></svg>
     </a>
 </div>
-<p>独立博客表面上是网站，但实际上我们作为内容的创作者，需要关注的只是它的内容——我们以后会经常更新的只是内容的部分。一个博客网站可以分为这几个部分：</p>
-<p><img
-  src="/howtouse/blog-site.png"
-  alt="blog-site"
-  title="blog-site"
-/></p>
-<p>最常见的博客系统 WordPress 是一款动态博客系统（PHP 程序），这类系统需要在云主机商（如阿里云）那里买专门的空间或来存储和发布（存储并运行 PHP 程序）我们的博客网站。</p>
-<!-- raw HTML omitted -->
-<div class="flex align-center gblog-post__anchorwrap">
-    <h2 id="静态博客系统"
+<p>抓取aws IAM信息并判断权限是否开大
+需要调用到基础接口脚本里的数据库读写和boto3库</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> boto3<span style="color:#f92672">,</span>json
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> botocore.exceptions <span style="color:#f92672">import</span> ClientError
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> BasicInterfaces <span style="color:#f92672">import</span> executeMysqlData
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">list_all_iam_users</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#列出所有 IAM 用户</span>
+</span></span><span style="display:flex;"><span>    iam_client <span style="color:#f92672">=</span> boto3<span style="color:#f92672">.</span>client(<span style="color:#e6db74">&#39;iam&#39;</span>)
+</span></span><span style="display:flex;"><span>    users <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    paginator <span style="color:#f92672">=</span> iam_client<span style="color:#f92672">.</span>get_paginator(<span style="color:#e6db74">&#39;list_users&#39;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> response <span style="color:#f92672">in</span> paginator<span style="color:#f92672">.</span> paginate():
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> user <span style="color:#f92672">in</span> response[<span style="color:#e6db74">&#39;Users&#39;</span>]:
+</span></span><span style="display:flex;"><span>            users<span style="color:#f92672">.</span>append(user[<span style="color:#e6db74">&#39;UserName&#39;</span>])
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> users
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_user_attached_policies</span>(user_name):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#获取用户附加的所有策略</span>
+</span></span><span style="display:flex;"><span>    iam_client <span style="color:#f92672">=</span> boto3<span style="color:#f92672">.</span>client(<span style="color:#e6db74">&#39;iam&#39;</span>)
+</span></span><span style="display:flex;"><span>    policies <span style="color:#f92672">=</span> iam_client<span style="color:#f92672">.</span>list_attached_user_policies(UserName<span style="color:#f92672">=</span> user_name)[<span style="color:#e6db74">&#39;AttachedPolicies&#39;</span>]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> policies
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_policy_document</span>(policy_arn):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#获取策略文档</span>
+</span></span><span style="display:flex;"><span>    iam_client <span style="color:#f92672">=</span> boto3<span style="color:#f92672">.</span>client(<span style="color:#e6db74">&#39;iam&#39;</span>)
+</span></span><span style="display:flex;"><span>    policy_details <span style="color:#f92672">=</span> iam_client<span style="color:#f92672">.</span>get_policy(PolicyArn<span style="color:#f92672">=</span> policy_arn)
+</span></span><span style="display:flex;"><span>    policy_version <span style="color:#f92672">=</span> iam_client<span style="color:#f92672">.</span>get_policy_version(PolicyArn<span style="color:#f92672">=</span> policy_arn,VersionId<span style="color:#f92672">=</span> policy_details[<span style="color:#e6db74">&#39; Policy&#39;</span>][<span style="color:#e6db74">&#39;DefaultVersionId&#39;</span>])
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> policy_version[<span style="color:#e6db74">&#39;PolicyVersion&#39;</span>][<span style="color:#e6db74">&#39; Document&#39;</span>]
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">validate_policy_with_access_analyzer</span>(policy_document):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#使用 Access Analyzer 验证策略</span>
+</span></span><span style="display:flex;"><span>    accessanalyzer_client <span style="color:#f92672">=</span> boto3<span style="color:#f92672">.</span>client(<span style="color:#e6db74">&#39;accessanalyzer&#39;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        response <span style="color:#f92672">=</span> accessanalyzer_client<span style="color:#f92672">.</span>validate_policy(
+</span></span><span style="display:flex;"><span>            policyType<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;IDENTITY_POLICY&#39;</span>,
+</span></span><span style="display:flex;"><span>            policyDocument<span style="color:#f92672">=</span> json<span style="color:#f92672">.</span>dumps(policy _ document)
+</span></span><span style="display:flex;"><span>            )
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> response[<span style="color:#e6db74">&#39; findings&#39;</span>]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> ClientError <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[ERROR] Access Analyzer 验证失败: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> []
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">detect_overly_permissive</span>(policy_document):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#自定义检测策略中过于宽泛的权限</span>
+</span></span><span style="display:flex;"><span>    findings <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> statement <span style="color:#f92672">in</span> policy_document[<span style="color:#e6db74">&#39;Statement&#39;</span>]:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> statement[<span style="color:#e6db74">&#39;Effect&#39;</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;Allow&#39;</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># 检查是否存在 Action 为 * 或 iam:*</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;Action&#39;</span> <span style="color:#f92672">in</span> statement <span style="color:#f92672">and</span> (<span style="color:#e6db74">&#39;*&#39;</span> <span style="color:#f92672">in</span> statement[<span style="color:#e6db74">&#39;Action&#39;</span>] <span style="color:#f92672">or</span> <span style="color:#e6db74">&#39;iam:*&#39;</span> <span style="color:#f92672">in</span> statement[<span style="color:#e6db74">&#39; Action&#39;</span>]):
+</span></span><span style="display:flex;"><span>                findings<span style="color:#f92672">.</span>append(<span style="color:#e6db74">&#34;found over operation privielges: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span><span style="color:#f92672">.</span>format(statement[<span style="color:#e6db74">&#39; Action&#39;</span>]))
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># 检查是否存在 Resource 为 *</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;Resource&#39;</span> <span style="color:#f92672">in</span> statement <span style="color:#f92672">and</span> <span style="color:#e6db74">&#39;*&#39;</span> <span style="color:#f92672">in</span> statement[<span style="color:#e6db74">&#39;Resource&#39;</span>]:
+</span></span><span style="display:flex;"><span>                findings<span style="color:#f92672">.</span>append(<span style="color:#e6db74">&#34;found over resource privielges: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span><span style="color:#f92672">.</span>format(statement[<span style="color:#e6db74">&#39; Resource&#39;</span>]))
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> findings
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">analyze_user_policies</span>(user_name):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#分析单个用户的策略</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">[INF0] 开始分析用户: </span><span style="color:#e6db74">{</span>user_name<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    policies <span style="color:#f92672">=</span> get_user_attached_policies(user_name)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> policies:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[INFO] 用户 </span><span style="color:#e6db74">{</span>user_name<span style="color:#e6db74">}</span><span style="color:#e6db74"> 没有附加策略&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> policy <span style="color:#f92672">in</span> policies:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;分析策略: </span><span style="color:#e6db74">{</span>policy[<span style="color:#e6db74">&#39;PolicyName&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        policy_document <span style="color:#f92672">=</span> get_policy_document(policy[<span style="color:#e6db74">&#39;PolicyArn&#39;</span>])
+</span></span><span style="display:flex;"><span>        findings <span style="color:#f92672">=</span> validate_policy_with_access_analyzer(policy_document)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> findings:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Access Analyzer 发现策略问题:&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> finding <span style="color:#f92672">in</span> findings:
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34; - </span><span style="color:#e6db74">{</span>finding[<span style="color:#e6db74">&#39;findingDetails&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                sql<span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;&#34;&#34;INSERT INTO gcpIamCheck (project, account, rules, action, recommend) VALUES (&#39;aws&#39;,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> user_name <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> policy[<span style="color:#e6db74">&#39;PolicyName&#39;</span>] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,&#39;remove&#39;,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> findings[<span style="color:#e6db74">&#39;findingDetails&#39;</span>] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">)&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>                executeMysqlData(<span style="color:#ae81ff">1</span>,<span style="color:#e6db74">&#39; write&#39;</span>, sql)
+</span></span><span style="display:flex;"><span>        print (<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;自动分析策略完成，开始自定义扫描策略&#34;</span>)
+</span></span><span style="display:flex;"><span>        manual_findings <span style="color:#f92672">=</span> detect_overly_permissive(policy_document)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> manual_findings:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> f <span style="color:#f92672">in</span> manual_findings:
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;  ！自定义检测发现：</span><span style="color:#e6db74">{</span>f<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;*&#39;</span> <span style="color:#f92672">in</span> f:
+</span></span><span style="display:flex;"><span>                    sql<span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;INSERT INTO gcpIamCheck (project, account, rules, action, recommend) VALUES  (&#39;aws&#39;,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> user_name <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> policy[<span style="color:#e6db74">&#39;PolicyName&#39;</span>] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,&#39;remove&#39;,&#39;resource_all&#39;)&#34;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                    sql<span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;INSERT INTO gcpIamCheck (project, account, rules, action, recommend) VALUES  (&#39;aws&#39;,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> user_name <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> policy[<span style="color:#e6db74">&#39;PolicyName&#39;</span>] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,&#39;remove&#39;,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> f <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span>))<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>                executeMysqlData(<span style="color:#ae81ff">1</span>,<span style="color:#e6db74">&#39; write&#39;</span>, sql)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;  自定义扫描未发现宽泛权限&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;[INFO] 开始扫描所有 IAM 用户…</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    all_users <span style="color:#f92672">=</span> list_all_iam_users()
+</span></span><span style="display:flex;"><span>    print (<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;发现用户</span><span style="color:#e6db74">{</span>all_users<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> all_users:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;[INFO] 当前账户没有 IAM 用户&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> user <span style="color:#f92672">in</span> all_users:
+</span></span><span style="display:flex;"><span>        analyze_user_policies(user)
+</span></span><span style="display:flex;"><span>main()
+</span></span></code></pre></div>
+      </section>
+      <div class="gblog-post__readmore">
+        
+      </div>
+
+      <footer class="gblog-post__footer">
+        <div class="flex flex-wrap align-center gblog-post__meta">
+          <span class="flex align-center no-wrap gblog-post__meta--update">
+  <svg class="gblog-icon gblog_date"><use xlink:href="#gblog_date"></use></svg>
+  <span class="gblog-post__tag">
+    <time datetime="2025-02-10T10:00:00&#43;08:00">
+      
+      Feb 10, 2025
+    </time>
+  </span>
+</span>
+
+<span class="flex align-center no-wrap gblog-post__meta--readtime">
+  <svg class="gblog-icon gblog_timer"><use xlink:href="#gblog_timer"></use></svg>
+  <span class="gblog-post__tag">2 min read</span>
+</span>
+
+
+
+
+
+
+
+
+  
+    
+    
+      
+        <span class="flex align-center no-wrap gblog-post__meta--tag">
+          <svg class="gblog-icon gblog_bookmark"><use xlink:href="#gblog_bookmark"></use></svg>
+          
+  <span class="gblog-post__tag gblog-button gblog-button--regular">
+    <a
+      class="gblog-button__link"
+      href="/tags/python/"
+      title="All posts tagged with 'Python'"
     >
-        静态博客系统
-    </h2>
-    <a data-clipboard-text="http://localhost:1313/posts/howtouse/#静态博客系统" class="gblog-post__anchor clip flex align-center" aria-label="Anchor 静态博客系统" href="#%e9%9d%99%e6%80%81%e5%8d%9a%e5%ae%a2%e7%b3%bb%e7%bb%9f">
+      Python
+    </a>
+  </span>
+
+        </span>
+      
+    
+    
+  
+
+
+
+
+
+
+        </div>
+      </footer>
+    </article>
+  
+    <article class="gblog-post">
+      <header class="gblog-post__header">
+        <h1 class="gblog-post__title">
+          <a href="/posts/getawsinfo/">aws虚拟机信息抓取</a>
+        </h1>
+      </header>
+
+      <section class="gblog-markdown">
+        <div class="flex align-center gblog-post__anchorwrap">
+    <h1 id="基于python3写的抓取aws虚拟机信息"
+    >
+        基于Python3写的抓取aws虚拟机信息
+    </h1>
+    <a data-clipboard-text="http://localhost:1313/posts/getawsinfo/#基于python3写的抓取aws虚拟机信息" class="gblog-post__anchor clip flex align-center" aria-label="Anchor 基于Python3写的抓取aws虚拟机信息" href="#%e5%9f%ba%e4%ba%8epython3%e5%86%99%e7%9a%84%e6%8a%93%e5%8f%96aws%e8%99%9a%e6%8b%9f%e6%9c%ba%e4%bf%a1%e6%81%af">
         <svg class="gblog-icon gblog_link"><use xlink:href="#gblog_link"></use></svg>
     </a>
 </div>
-<p>所谓静态博客系统指的是，博客网站是由一系列的静态 HTML 文件，以及对应的多媒体素材等组成，只要找一个可以存储文件的平台即可发布网站。有许多工具，可以把一篇篇博客文章的 Markdown 文件，配上博客主题之后转换为可以直接发布的 HTML 文件。</p>
-<p><img
-  src="/howtouse/templating.png"
-  alt="templating"
-  title="templating"
+<p>拉取aws虚拟机信息
+需要调用到基础接口脚本里的数据库读写和boto3库</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> boto3
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> BasicInterfaces <span style="color:#f92672">import</span> executeMysqlData
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">assume_role</span>(account_id,role_name,region_name):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#假设角色，返回新的 AWS 会话</span>
+</span></span><span style="display:flex;"><span>    sts_client <span style="color:#f92672">=</span> boto3<span style="color:#f92672">.</span>client(<span style="color:#e6db74">&#34;sts&#34;</span>,region_name<span style="color:#f92672">=</span> region_name)
+</span></span><span style="display:flex;"><span>    role_arn <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;arn:aws:iam::</span><span style="color:#e6db74">{</span>account_id<span style="color:#e6db74">}</span><span style="color:#e6db74">:role/</span><span style="color:#e6db74">{</span>role_name<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#假设角色</span>
+</span></span><span style="display:flex;"><span>    response <span style="color:#f92672">=</span> sts_client<span style="color:#f92672">.</span>assume_role(RoleArn<span style="color:#f92672">=</span> role_arn,RoleSessionName<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;AssumeRoleSession&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#获取临时凭证</span>
+</span></span><span style="display:flex;"><span>    credentials <span style="color:#f92672">=</span> response[<span style="color:#e6db74">&#34;Credentials&#34;</span>]
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#返回新的会话</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> boto3<span style="color:#f92672">.</span>Session(
+</span></span><span style="display:flex;"><span>        aws_access_key_id<span style="color:#f92672">=</span> credentials[<span style="color:#e6db74">&#34;AccessKeyId&#34;</span>],
+</span></span><span style="display:flex;"><span>        aws_secret_access_key<span style="color:#f92672">=</span> credentials[<span style="color:#e6db74">&#34;SecretAccessKey&#34;</span>],
+</span></span><span style="display:flex;"><span>        aws_session_token<span style="color:#f92672">=</span> credentials[<span style="color:#e6db74">&#34;SessionToken&#34;</span>],
+</span></span><span style="display:flex;"><span>        region_name<span style="color:#f92672">=</span> region_name
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_all_regions</span>(session):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#获取所有支持的区域</span>
+</span></span><span style="display:flex;"><span>    ec2_client <span style="color:#f92672">=</span> session<span style="color:#f92672">.</span>client(<span style="color:#e6db74">&#34;ec2&#34;</span>)
+</span></span><span style="display:flex;"><span>    response <span style="color:#f92672">=</span> ec2_client<span style="color:#f92672">.</span>describe_regions(AllRegions<span style="color:#f92672">=</span> <span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> [region[<span style="color:#e6db74">&#34;RegionName&#34;</span>] <span style="color:#66d9ef">for</span> region <span style="color:#f92672">in</span> response[<span style="color:#e6db74">&#34; Regions&#34;</span>]]
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_ec2_instance_info</span>(session, region_name):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#获取指定区域内的 EC2 实例信息</span>
+</span></span><span style="display:flex;"><span>    ec2_client <span style="color:#f92672">=</span> session<span style="color:#f92672">.</span>client(<span style="color:#e6db74">&#34;ec2&#34;</span>,region_name<span style="color:#f92672">=</span> region _ name)
+</span></span><span style="display:flex;"><span>    response <span style="color:#f92672">=</span> ec2_client<span style="color:#f92672">.</span>describe_instances()
+</span></span><span style="display:flex;"><span>    instance_info_list <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> reservation <span style="color:#f92672">in</span> response[<span style="color:#e6db74">&#34; Reservations&#34;</span>]:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> instance <span style="color:#f92672">in</span> reservation[<span style="color:#e6db74">&#34; Instances&#34;</span>]:
+</span></span><span style="display:flex;"><span>            instance_info <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;InstanceId&#34;</span>: instance<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;InstanceId&#34;</span>),
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;Name&#34;</span>: <span style="color:#e6db74">&#34;&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;Platform&#34;</span>: instance<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;Platform&#34;</span>, <span style="color:#e6db74">&#34;Linux/Unix&#34;</span>),
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;PrivateIp&#34;</span>: instance<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;PrivateIpAddress&#34;</span>),
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;PublicIp&#34;</span>: instance<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;PublicIpAddress&#34;</span>),
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;SecurityGroups&#34;</span>: [sg[<span style="color:#e6db74">&#34;GroupName&#34;</span>] <span style="color:#66d9ef">for</span> sg <span style="color:#f92672">in</span> instance<span style="color:#f92672">.</span> get(<span style="color:#e6db74">&#34;SecurityGroups&#34;</span>, [])],
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;Region&#34;</span>: region_name
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e">#获取实例名称(从标签中获取 Name 标签)</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span><span style="color:#e6db74">&#34;Tags&#34;</span> <span style="color:#f92672">in</span> instance:
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">for</span> tag <span style="color:#f92672">in</span> instance[<span style="color:#e6db74">&#34;Tags&#34;</span>]:
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">if</span> tag[<span style="color:#e6db74">&#34;Key&#34;</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;Name&#34;</span>:
+</span></span><span style="display:flex;"><span>                            instance_info[<span style="color:#e6db74">&#34;Name&#34;</span>] <span style="color:#f92672">=</span> tag[<span style="color:#e6db74">&#34;Value&#34;</span>]
+</span></span><span style="display:flex;"><span>                            <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>            instance_info_list<span style="color:#f92672">.</span>append(instance_info)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> instance_info_list
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#多账户配置</span>
+</span></span><span style="display:flex;"><span>    accounts <span style="color:#f92672">=</span> [{
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;account_id&#34;</span>: <span style="color:#e6db74">&#34;&lt;awsID&gt;&#34;</span>, 
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;role_name&#34;</span>: <span style="color:#e6db74">&#34;&lt;rolename&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34; account_id&#34;</span>: <span style="color:#e6db74">&#34;&lt;awsID&gt;&#34;</span>, <span style="color:#e6db74">&#34; role_name&#34;</span>: <span style="color:#e6db74">&#34;&lt;rolename&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>        }]
+</span></span><span style="display:flex;"><span>    all_instances <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> account <span style="color:#f92672">in</span> accounts:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Fetching EC2 instances for account: </span><span style="color:#e6db74">{</span>account[<span style="color:#e6db74">&#39;account_id&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">#假设角色到第一个区域以获取所有可用区域</span>
+</span></span><span style="display:flex;"><span>            session <span style="color:#f92672">=</span> assume_role(account[<span style="color:#e6db74">&#34;account_id&#34;</span>], account[<span style="color:#e6db74">&#34;role_name&#34;</span>], <span style="color:#e6db74">&#34;us-east-1&#34;</span>)
+</span></span><span style="display:flex;"><span>            regions <span style="color:#f92672">=</span> get_all_regions(session)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> region <span style="color:#f92672">in</span> regions:
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Fetching EC2 instances for region: </span><span style="color:#e6db74">{</span>region<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                    <span style="color:#75715e">#假设角色并切换区域</span>
+</span></span><span style="display:flex;"><span>                    session <span style="color:#f92672">=</span> assume_role(account[<span style="color:#e6db74">&#34;account_id&#34;</span>], account[<span style="color:#e6db74">&#34;role_name&#34;</span>], region)
+</span></span><span style="display:flex;"><span>                    instances <span style="color:#f92672">=</span> get_ec2_instance_info(session, region)
+</span></span><span style="display:flex;"><span>                    <span style="color:#75715e">#添加账户标识</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">for</span> instance <span style="color:#f92672">in</span> instances:
+</span></span><span style="display:flex;"><span>                        instance[<span style="color:#e6db74">&#34;AccountId&#34;</span>] <span style="color:#f92672">=</span> account[<span style="color:#e6db74">&#34;account_id&#34;</span>]
+</span></span><span style="display:flex;"><span>                        all_instances<span style="color:#f92672">.</span>extend(instances)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#输出所有实例信息</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> instance <span style="color:#f92672">in</span> all_instances:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> instance[<span style="color:#e6db74">&#39;PublicIp&#39;</span>] <span style="color:#f92672">==</span> <span style="color:#66d9ef">None</span>:
+</span></span><span style="display:flex;"><span>            instance[<span style="color:#e6db74">&#39;PublicIp&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Unknown&#39;</span>
+</span></span><span style="display:flex;"><span>        sql<span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;&#34;&#34;INSERT INTO gcpinfo(project, name, extip, intip, tags, machinetype, cloud) VALUES (</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> instance[<span style="color:#e6db74">&#39;AccountId&#39;</span>] <span style="color:#f92672">+</span>  <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> instance[<span style="color:#e6db74">&#39;Name&#39;</span>] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> instance[<span style="color:#e6db74">&#39;PublicIp&#39;</span>] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> instance[<span style="color:#e6db74">&#39;PrivateIp&#39;</span>] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> instance[<span style="color:#e6db74">&#39;InstanceType&#39;</span>] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> instance[<span style="color:#e6db74">&#39;Platform&#39;</span>] <span style="color:#f92672">+</span><span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,&#39;aws&#39;)&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        executeMysqlData(<span style="color:#ae81ff">1</span>,<span style="color:#e6db74">&#39;write&#39;</span>, sql)
+</span></span></code></pre></div>
+      </section>
+      <div class="gblog-post__readmore">
+        
+      </div>
+
+      <footer class="gblog-post__footer">
+        <div class="flex flex-wrap align-center gblog-post__meta">
+          <span class="flex align-center no-wrap gblog-post__meta--update">
+  <svg class="gblog-icon gblog_date"><use xlink:href="#gblog_date"></use></svg>
+  <span class="gblog-post__tag">
+    <time datetime="2025-02-10T10:00:00&#43;08:00">
+      
+      Feb 10, 2025
+    </time>
+  </span>
+</span>
+
+<span class="flex align-center no-wrap gblog-post__meta--readtime">
+  <svg class="gblog-icon gblog_timer"><use xlink:href="#gblog_timer"></use></svg>
+  <span class="gblog-post__tag">2 min read</span>
+</span>
+
+
+
+
+
+
+
+
+  
+    
+    
+      
+        <span class="flex align-center no-wrap gblog-post__meta--tag">
+          <svg class="gblog-icon gblog_bookmark"><use xlink:href="#gblog_bookmark"></use></svg>
+          
+  <span class="gblog-post__tag gblog-button gblog-button--regular">
+    <a
+      class="gblog-button__link"
+      href="/tags/python/"
+      title="All posts tagged with 'Python'"
+    >
+      Python
+    </a>
+  </span>
+
+        </span>
+      
+    
+    
+  
+
+
+
+
+
+
+        </div>
+      </footer>
+    </article>
+  
+    <article class="gblog-post">
+      <header class="gblog-post__header">
+        <h1 class="gblog-post__title">
+          <a href="/posts/getawsfirewallinfo/">aws防火墙信息抓取</a>
+        </h1>
+      </header>
+
+      <section class="gblog-markdown">
+        <div class="flex align-center gblog-post__anchorwrap">
+    <h1 id="基于python3写的抓取aws防火墙信息"
+    >
+        基于Python3写的抓取aws防火墙信息
+    </h1>
+    <a data-clipboard-text="http://localhost:1313/posts/getawsfirewallinfo/#基于python3写的抓取aws防火墙信息" class="gblog-post__anchor clip flex align-center" aria-label="Anchor 基于Python3写的抓取aws防火墙信息" href="#%e5%9f%ba%e4%ba%8epython3%e5%86%99%e7%9a%84%e6%8a%93%e5%8f%96aws%e9%98%b2%e7%81%ab%e5%a2%99%e4%bf%a1%e6%81%af">
+        <svg class="gblog-icon gblog_link"><use xlink:href="#gblog_link"></use></svg>
+    </a>
+</div>
+<p>拉取aws防火墙信息
+需要调用到基础接口脚本里的数据库读写和boto3库</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> boto3
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> botocore.exceptions
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> ClientError
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> BasicInterfaces <span style="color:#f92672">import</span> executeMysqlData
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#获取所有可用区域</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_all_regions</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        ec2_client <span style="color:#f92672">=</span> boto3<span style="color:#f92672">.</span>client(<span style="color:#e6db74">&#39;ec2&#39;</span>)
+</span></span><span style="display:flex;"><span>        response <span style="color:#f92672">=</span> ec2_client<span style="color:#f92672">.</span>describe_regions()
+</span></span><span style="display:flex;"><span>        regions <span style="color:#f92672">=</span> [region[<span style="color:#e6db74">&#39;RegionName&#39;</span>]
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> region <span style="color:#f92672">in</span> response[<span style="color:#e6db74">&#39;Regions&#39;</span>]]
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> regions
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> ClientError <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34; Error fetching regions: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> []
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#获取指定区域的安全组</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_security_groups_in_region</span>(session, region):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        ec2_ client <span style="color:#f92672">=</span> session<span style="color:#f92672">.</span>client(<span style="color:#e6db74">&#39;ec2&#39;</span>, region_name<span style="color:#f92672">=</span>region)
+</span></span><span style="display:flex;"><span>        response <span style="color:#f92672">=</span> ec2_client<span style="color:#f92672">.</span>describe_security_groups()
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> response[<span style="color:#e6db74">&#39;SecurityGroups&#39;</span>]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> ClientError <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34; Error describing security groups in region </span><span style="color:#e6db74">{</span>region<span style="color:#e6db74">}</span><span style="color:#e6db74">: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> []
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#遍历所有区域获取安全组</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_security_groups_by_region</span>(session):
+</span></span><span style="display:flex;"><span>    security_groups_by_region <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>    regions <span style="color:#f92672">=</span> get_all_regions()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> region <span style="color:#f92672">in</span> regions:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34; Processing region: </span><span style="color:#e6db74">{</span>region<span style="color:#e6db74">}</span><span style="color:#e6db74">... &#34;</span>)
+</span></span><span style="display:flex;"><span>        security_groups <span style="color:#f92672">=</span> get_security_groups_in_region(session, region)
+</span></span><span style="display:flex;"><span>        security_groups_by_region[region] <span style="color:#f92672">=</span> security_groups
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> security_groups_by_region
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#示例：遍历所有账户和区域的安全组</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">collect_security_groups_by_account_and_region</span>(target _ accounts):
+</span></span><span style="display:flex;"><span>    account_security_groups <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> role_arn <span style="color:#f92672">in</span> target_accounts:
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 从 RoleArn 提取 Account ID</span>
+</span></span><span style="display:flex;"><span>        account_id <span style="color:#f92672">=</span> role_arn<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#34;:&#34;</span>)[<span style="color:#ae81ff">4</span>]
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34; Processing account </span><span style="color:#e6db74">{</span>account _ id<span style="color:#e6db74">}</span><span style="color:#e6db74">... &#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">#切换到目标账户角色</span>
+</span></span><span style="display:flex;"><span>        session <span style="color:#f92672">=</span> assume_role(role_arn)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> session:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">continue</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            security_groups_by_region <span style="color:#f92672">=</span> get_security_groups_by_region(session)
+</span></span><span style="display:flex;"><span>            account_security_groups[account_id] <span style="color:#f92672">=</span> security_groups_by_region
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> account_security_groups
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># AssumeRole 函数(参考前面代码)</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">assume_role</span>(role_arn, session_name<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;CrossAccountSession&#34;</span>):
+</span></span><span style="display:flex;"><span>    sts_client <span style="color:#f92672">=</span> boto3<span style="color:#f92672">.</span>client(<span style="color:#e6db74">&#39;sts&#39;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        response <span style="color:#f92672">=</span> sts_client<span style="color:#f92672">.</span>assume_role(RoleArn<span style="color:#f92672">=</span> role_arn,RoleSessionName <span style="color:#f92672">=</span> session_name)
+</span></span><span style="display:flex;"><span>        credentials <span style="color:#f92672">=</span> response[<span style="color:#e6db74">&#39;Credentials&#39;</span>]
+</span></span><span style="display:flex;"><span>        session <span style="color:#f92672">=</span> boto3<span style="color:#f92672">.</span>session<span style="color:#f92672">.</span>Session(
+</span></span><span style="display:flex;"><span>            aws_access_key_id<span style="color:#f92672">=</span> credentials[<span style="color:#e6db74">&#39;AccessKeyId&#39;</span>],
+</span></span><span style="display:flex;"><span>            aws_secret_access_key<span style="color:#f92672">=</span> credentials[<span style="color:#e6db74">&#39;SecretAccessKey&#39;</span>],
+</span></span><span style="display:flex;"><span>            aws_session_token<span style="color:#f92672">=</span> credentials[<span style="color:#e6db74">&#39;SessionToken&#39;</span>]
+</span></span><span style="display:flex;"><span>            )
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> session
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> ClientError <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34; Error assuming role </span><span style="color:#e6db74">{</span>role _ arn<span style="color:#e6db74">}</span><span style="color:#e6db74">: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">None</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#示例目标账户 RoleArn 列表</span>
+</span></span><span style="display:flex;"><span>TARGET_ACCOUNTS <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;arn:aws:iam::&lt;awsID&gt;:role/&lt;跨账号访问的角色名&gt;&#34;</span>,<span style="color:#e6db74">&#34; arn:aws:iam::&lt;awsID&gt;:role/&lt;本地账号角色&gt;&#34;</span>]
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#获取所有账户和区域的安全组</span>
+</span></span><span style="display:flex;"><span>security_groups_by_account_and_region <span style="color:#f92672">=</span> collect_security_groups_by_account_and_region(TARGET_ACCOUNTS)
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#打印结果</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> account_id,regions <span style="color:#f92672">in</span> security_groups_by_account_and_region<span style="color:#f92672">.</span>items():
+</span></span><span style="display:flex;"><span>    account <span style="color:#f92672">=</span> account_id
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> region,security_groups <span style="color:#f92672">in</span> regions<span style="color:#f92672">.</span>items():
+</span></span><span style="display:flex;"><span>        regionRecord <span style="color:#f92672">=</span> region
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> sg <span style="color:#f92672">in</span> security_groups:
+</span></span><span style="display:flex;"><span>            rulename <span style="color:#f92672">=</span> sg[<span style="color:#e6db74">&#39;GroupName&#39;</span>]
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> rule <span style="color:#f92672">in</span> sg[<span style="color:#e6db74">&#39;IpPermissions&#39;</span>]:
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> rule[<span style="color:#e6db74">&#39;IpProtocol&#39;</span>] <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#39;-1&#39;</span>:
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> rule[<span style="color:#e6db74">&#39;IpRanges&#39;</span>]:
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;0.0.0.0/0&#39;</span> <span style="color:#f92672">in</span> i[<span style="color:#e6db74">&#39;CidrIp&#39;</span>]:
+</span></span><span style="display:flex;"><span>                            protocol <span style="color:#f92672">=</span> rule[<span style="color:#e6db74">&#39;IpProtocol&#39;</span>]
+</span></span><span style="display:flex;"><span>                            fromPort <span style="color:#f92672">=</span> rule[<span style="color:#e6db74">&#39;FromPort&#39;</span>]
+</span></span><span style="display:flex;"><span>                            toPort <span style="color:#f92672">=</span> rule[<span style="color:#e6db74">&#39;ToPort&#39;</span>]
+</span></span><span style="display:flex;"><span>                            ports <span style="color:#f92672">=</span> str(fromPort)<span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;-&#39;</span> <span style="color:#f92672">+</span> str(toPort)
+</span></span><span style="display:flex;"><span>                            sql<span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;&#34;&#34;INSERT INTO gcpfirewall (cloud,project,rulename,action,direction,protocol,ports) VALUES(&#39;aws&#39;,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> regionRecord <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> rulename <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,&#39;allow&#39;,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> account <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> protocol <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> ports <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">)&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>                            executeMysqLData(<span style="color:#ae81ff">1</span>,<span style="color:#e6db74">&#39; write&#39;</span>, sql)
+</span></span></code></pre></div>
+      </section>
+      <div class="gblog-post__readmore">
+        
+      </div>
+
+      <footer class="gblog-post__footer">
+        <div class="flex flex-wrap align-center gblog-post__meta">
+          <span class="flex align-center no-wrap gblog-post__meta--update">
+  <svg class="gblog-icon gblog_date"><use xlink:href="#gblog_date"></use></svg>
+  <span class="gblog-post__tag">
+    <time datetime="2025-02-10T10:00:00&#43;08:00">
+      
+      Feb 10, 2025
+    </time>
+  </span>
+</span>
+
+<span class="flex align-center no-wrap gblog-post__meta--readtime">
+  <svg class="gblog-icon gblog_timer"><use xlink:href="#gblog_timer"></use></svg>
+  <span class="gblog-post__tag">2 min read</span>
+</span>
+
+
+
+
+
+
+
+
+  
+    
+    
+      
+        <span class="flex align-center no-wrap gblog-post__meta--tag">
+          <svg class="gblog-icon gblog_bookmark"><use xlink:href="#gblog_bookmark"></use></svg>
+          
+  <span class="gblog-post__tag gblog-button gblog-button--regular">
+    <a
+      class="gblog-button__link"
+      href="/tags/python/"
+      title="All posts tagged with 'Python'"
+    >
+      Python
+    </a>
+  </span>
+
+        </span>
+      
+    
+    
+  
+
+
+
+
+
+
+        </div>
+      </footer>
+    </article>
+  
+    <article class="gblog-post">
+      <header class="gblog-post__header">
+        <h1 class="gblog-post__title">
+          <a href="/posts/getgcpiam/">gcp IAM信息并判断权限是否开大</a>
+        </h1>
+      </header>
+
+      <section class="gblog-markdown">
+        <div class="flex align-center gblog-post__anchorwrap">
+    <h1 id="基于python3写的抓取gcp-iam信息并判断权限是否开大"
+    >
+        基于Python3写的抓取gcp IAM信息并判断权限是否开大
+    </h1>
+    <a data-clipboard-text="http://localhost:1313/posts/getgcpiam/#基于python3写的抓取gcp-iam信息并判断权限是否开大" class="gblog-post__anchor clip flex align-center" aria-label="Anchor 基于Python3写的抓取gcp IAM信息并判断权限是否开大" href="#%e5%9f%ba%e4%ba%8epython3%e5%86%99%e7%9a%84%e6%8a%93%e5%8f%96gcp-iam%e4%bf%a1%e6%81%af%e5%b9%b6%e5%88%a4%e6%96%ad%e6%9d%83%e9%99%90%e6%98%af%e5%90%a6%e5%bc%80%e5%a4%a7">
+        <svg class="gblog-icon gblog_link"><use xlink:href="#gblog_link"></use></svg>
+    </a>
+</div>
+<p>抓取gcp IAM信息并判断权限是否开大
+需要调用到基础接口脚本里的数据库读写和google cloud库</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> google.cloud <span style="color:#f92672">import</span> resourcemanager_v3
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> google.cloud <span style="color:#f92672">import</span> recommender_v1
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> google.oauth2 <span style="color:#f92672">import</span> service_account
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> BasicInterfaces <span style="color:#f92672">import</span> executeMysqlData
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> json<span style="color:#f92672">,</span>time
+</span></span><span style="display:flex;"><span>credentials <span style="color:#f92672">=</span> service_account<span style="color:#f92672">.</span>Credentials<span style="color:#f92672">.</span>from_service_account_file(<span style="color:#e6db74">&#39;&lt;xxx.json&gt;&#39;</span>)
+</span></span><span style="display:flex;"><span>resource_manager_client <span style="color:#f92672">=</span> resourcemanager_v3<span style="color:#f92672">.</span>ProjectsClient(credentials<span style="color:#f92672">=</span> credentials)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">list_iam_recommendations</span>(project_id, location<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;global&#34;</span>, recommender_id<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;google.iam.policy.Recommender&#34;</span>):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;获取 IAM 权限优化建议&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    parent <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;projects/</span><span style="color:#e6db74">{</span>project_id<span style="color:#e6db74">}</span><span style="color:#e6db74">/locations/</span><span style="color:#e6db74">{</span>location<span style="color:#e6db74">}</span><span style="color:#e6db74">/recommenders/</span><span style="color:#e6db74">{</span>recommender_id<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#获取建议</span>
+</span></span><span style="display:flex;"><span>    recommender_client <span style="color:#f92672">=</span> recommender_v1<span style="color:#f92672">.</span>RecommenderClient(credentials<span style="color:#f92672">=</span> credentials)
+</span></span><span style="display:flex;"><span>    recommendations <span style="color:#f92672">=</span> recommender_client<span style="color:#f92672">.</span>list_recommendations(parent<span style="color:#f92672">=</span> parent)
+</span></span><span style="display:flex;"><span>    userDict <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> recommenders <span style="color:#f92672">in</span> recommendations:
+</span></span><span style="display:flex;"><span>        resourcesDict <span style="color:#f92672">=</span> dict(recommenders<span style="color:#f92672">.</span>content<span style="color:#f92672">.</span>overview)
+</span></span><span style="display:flex;"><span>        user <span style="color:#f92672">=</span> resourcesDict[<span style="color:#e6db74">&#39;member&#39;</span>]<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;:&#39;</span>)[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>        addRoles <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> resourcesDict[<span style="color:#e6db74">&#39;addedRoles&#39;</span>]:
+</span></span><span style="display:flex;"><span>            addRoles<span style="color:#f92672">.</span>append(i<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;/&#39;</span>)[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>])
+</span></span><span style="display:flex;"><span>        userDict[user] <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#39;remove&#39;</span>:resourcesDict[<span style="color:#e6db74">&#39;removedRole&#39;</span>]<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;/&#39;</span>)[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>],<span style="color:#e6db74">&#39;add&#39;</span>:addRoles}
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> userDict
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_project_iam_policy</span>(project_id, data<span style="color:#f92672">=</span>{}):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;获取项目的 IAM 策略&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    project_name <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;projects/</span><span style="color:#e6db74">{</span>project_id<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>    policy <span style="color:#f92672">=</span> resource_manager_client<span style="color:#f92672">.</span>get_iam_policy(resource<span style="color:#f92672">=</span> project_name)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> binding <span style="color:#f92672">in</span> policy<span style="color:#f92672">.</span>bindings:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> binding<span style="color:#f92672">.</span>members:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> i <span style="color:#f92672">not</span> <span style="color:#f92672">in</span> data:
+</span></span><span style="display:flex;"><span>                account <span style="color:#f92672">=</span> i<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;:&#39;</span>)[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;?&#39;</span>)[θ]
+</span></span><span style="display:flex;"><span>                data[account] <span style="color:#f92672">=</span> {}data[account][<span style="color:#e6db74">&#34; unknown&#34;</span>] <span style="color:#f92672">=</span> []data[account][<span style="color:#e6db74">&#34; unknown&#34;</span>]<span style="color:#f92672">.</span> append(str(binding<span style="color:#f92672">.</span> role)<span style="color:#f92672">.</span> split(<span style="color:#e6db74">&#39;/&#39;</span>)[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>])<span style="color:#66d9ef">return</span> dataproject _ ids <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>                    <span style="color:#e6db74">&#34;&lt;gcp显示项目名&gt;&#34;</span>:<span style="color:#e6db74">&#34; &lt;gcp实际项目名&gt;&#34;</span>,
+</span></span><span style="display:flex;"><span>                    }
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> project <span style="color:#f92672">in</span> project_ids:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        iamRecommenderDict <span style="color:#f92672">=</span> list_iam_recommendations(project_ids[project])
+</span></span><span style="display:flex;"><span>        iamDict <span style="color:#f92672">=</span> get_project_iam_policy(project_ids[project])
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> iamDict:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> i <span style="color:#f92672">not</span> <span style="color:#f92672">in</span> iamRecommenderDict:
+</span></span><span style="display:flex;"><span>                iamRecommenderDict[i] <span style="color:#f92672">=</span> iamDict[i]
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> account <span style="color:#f92672">in</span> iamRecommenderDict:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> iamRecommenderDict[account]:
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> i <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;unknown&#39;</span>:
+</span></span><span style="display:flex;"><span>                    sql<span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;&#34;&#34;INSERT INTO gcpIamCheck (project, account,rules,action) VALUES (</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> project  <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> account <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;,&#34;</span><span style="color:#f92672">.</span>join(iamRecommenderDict[account][i])<span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> i <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">)&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>                    executeMysqlData(<span style="color:#ae81ff">1</span>,<span style="color:#e6db74">&#39; write&#39;</span>, sql)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">elif</span> i <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;remove&#39;</span>:
+</span></span><span style="display:flex;"><span>                    sql<span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;&#34;&#34;INSERT INTO gcpIamCheck (project, account, recommend, action) VALUES (</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> project <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> account <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> iamRecommenderDict[account][i] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#f92672">+</span> i <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">)&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>                    executeMysqlData(<span style="color:#ae81ff">1</span>,<span style="color:#e6db74">&#39; write&#39;</span>, sql)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">elif</span> i <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39; add&#39;</span>:
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> len(iamRecommenderDict[account][i]) <span style="color:#f92672">!=</span> θ:
+</span></span><span style="display:flex;"><span>                        sql<span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;&#34;&#34;INSERT INTO gcpIamCheck (project, account, recommend, action) VALUES (</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> project <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> account <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> iamRecommenderDict[account][i] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> i <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">)&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>                        executeMysqlData(<span style="color:#ae81ff">1</span>,<span style="color:#e6db74">&#39; write&#39;</span>, sql)
+</span></span><span style="display:flex;"><span>        iamDict <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>        iamRecommenderDict<span style="color:#f92672">=</span>{}
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span>:
+</span></span><span style="display:flex;"><span>        sql<span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;&#34;&#34;INSERT INTO gcpIamCheck (project, account, action) VALUES (</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> project <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,&#39;unknown&#39;,&#39;unknown&#39;)&#34;&#34;&#34;</span>executeMysqlData(<span style="color:#ae81ff">1</span>,<span style="color:#e6db74">&#39; write&#39;</span>, sql)
+</span></span></code></pre></div>
+      </section>
+      <div class="gblog-post__readmore">
+        
+      </div>
+
+      <footer class="gblog-post__footer">
+        <div class="flex flex-wrap align-center gblog-post__meta">
+          <span class="flex align-center no-wrap gblog-post__meta--update">
+  <svg class="gblog-icon gblog_date"><use xlink:href="#gblog_date"></use></svg>
+  <span class="gblog-post__tag">
+    <time datetime="2025-02-10T10:00:00&#43;08:00">
+      
+      Feb 10, 2025
+    </time>
+  </span>
+</span>
+
+<span class="flex align-center no-wrap gblog-post__meta--readtime">
+  <svg class="gblog-icon gblog_timer"><use xlink:href="#gblog_timer"></use></svg>
+  <span class="gblog-post__tag">2 min read</span>
+</span>
+
+
+
+
+
+
+
+
+  
+    
+    
+      
+        <span class="flex align-center no-wrap gblog-post__meta--tag">
+          <svg class="gblog-icon gblog_bookmark"><use xlink:href="#gblog_bookmark"></use></svg>
+          
+  <span class="gblog-post__tag gblog-button gblog-button--regular">
+    <a
+      class="gblog-button__link"
+      href="/tags/python/"
+      title="All posts tagged with 'Python'"
+    >
+      Python
+    </a>
+  </span>
+
+        </span>
+      
+    
+    
+  
+
+
+
+
+
+
+        </div>
+      </footer>
+    </article>
+  
+    <article class="gblog-post">
+      <header class="gblog-post__header">
+        <h1 class="gblog-post__title">
+          <a href="/posts/listbucketsize/">gcp存储桶使用情况</a>
+        </h1>
+      </header>
+
+      <section class="gblog-markdown">
+        <div class="flex align-center gblog-post__anchorwrap">
+    <h1 id="基于python3写的读取gcp存储桶使用情况"
+    >
+        基于Python3写的读取gcp存储桶使用情况
+    </h1>
+    <a data-clipboard-text="http://localhost:1313/posts/listbucketsize/#基于python3写的读取gcp存储桶使用情况" class="gblog-post__anchor clip flex align-center" aria-label="Anchor 基于Python3写的读取gcp存储桶使用情况" href="#%e5%9f%ba%e4%ba%8epython3%e5%86%99%e7%9a%84%e8%af%bb%e5%8f%96gcp%e5%ad%98%e5%82%a8%e6%a1%b6%e4%bd%bf%e7%94%a8%e6%83%85%e5%86%b5">
+        <svg class="gblog-icon gblog_link"><use xlink:href="#gblog_link"></use></svg>
+    </a>
+</div>
+<p>读取gcp存储桶使用情况
+需要调用到基础接口脚本里的数据库读写和google cloud库</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> google.cloud <span style="color:#f92672">import</span> storage
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> google.oauth2 <span style="color:#f92672">import</span> service_account
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#替换为服务账号的密钥文件路径</span>
+</span></span><span style="display:flex;"><span>SERVICE_ACCOUNT_FILE <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;xxx.json&gt;&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#初始化客户端时使用服务账号凭据</span>
+</span></span><span style="display:flex;"><span>credentials <span style="color:#f92672">=</span> service_account<span style="color:#f92672">.</span>Credentials<span style="color:#f92672">.</span>from_service_account_file(SERVICE_ACCOUNT_FILE)
+</span></span><span style="display:flex;"><span>storage_client <span style="color:#f92672">=</span> storage<span style="color:#f92672">.</span>Client(credentials<span style="color:#f92672">=</span> credentials)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">list_buckets_and_objects</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;列出所有存储桶及其对象&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    buckets <span style="color:#f92672">=</span> storage_client<span style="color:#f92672">.</span>list_buckets()
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#39;Bucket Name&#39;</span><span style="color:#e6db74">:</span><span style="color:#e6db74">&lt;30</span><span style="color:#e6db74">}{</span><span style="color:#e6db74">&#39;Total Size (GB)&#39;</span><span style="color:#e6db74">:</span><span style="color:#e6db74">&gt;20</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;-&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">50</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> bucket <span style="color:#f92672">in</span> buckets:
+</span></span><span style="display:flex;"><span>        total_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>        blobs <span style="color:#f92672">=</span> storage_client<span style="color:#f92672">.</span>list_blobs(bucket<span style="color:#f92672">.</span>name)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> blob <span style="color:#f92672">in</span> blobs:
+</span></span><span style="display:flex;"><span>            total_size <span style="color:#f92672">+=</span> blob<span style="color:#f92672">.</span>size
+</span></span><span style="display:flex;"><span>        total_size_gb <span style="color:#f92672">=</span> total_size <span style="color:#f92672">/</span> (<span style="color:#ae81ff">1024</span> <span style="color:#f92672">**</span> <span style="color:#ae81ff">3</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>bucket<span style="color:#f92672">.</span>name<span style="color:#e6db74">:</span><span style="color:#e6db74">&lt;30</span><span style="color:#e6db74">}{</span>total_size_gb<span style="color:#e6db74">:</span><span style="color:#e6db74">&gt;20.2f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#执行函数</span>
+</span></span><span style="display:flex;"><span>list_buckets_and_objects()
+</span></span></code></pre></div>
+      </section>
+      <div class="gblog-post__readmore">
+        
+      </div>
+
+      <footer class="gblog-post__footer">
+        <div class="flex flex-wrap align-center gblog-post__meta">
+          <span class="flex align-center no-wrap gblog-post__meta--update">
+  <svg class="gblog-icon gblog_date"><use xlink:href="#gblog_date"></use></svg>
+  <span class="gblog-post__tag">
+    <time datetime="2025-02-10T10:00:00&#43;08:00">
+      
+      Feb 10, 2025
+    </time>
+  </span>
+</span>
+
+<span class="flex align-center no-wrap gblog-post__meta--readtime">
+  <svg class="gblog-icon gblog_timer"><use xlink:href="#gblog_timer"></use></svg>
+  <span class="gblog-post__tag">1 min read</span>
+</span>
+
+
+
+
+
+
+
+
+  
+    
+    
+      
+        <span class="flex align-center no-wrap gblog-post__meta--tag">
+          <svg class="gblog-icon gblog_bookmark"><use xlink:href="#gblog_bookmark"></use></svg>
+          
+  <span class="gblog-post__tag gblog-button gblog-button--regular">
+    <a
+      class="gblog-button__link"
+      href="/tags/python/"
+      title="All posts tagged with 'Python'"
+    >
+      Python
+    </a>
+  </span>
+
+        </span>
+      
+    
+    
+  
+
+
+
+
+
+
+        </div>
+      </footer>
+    </article>
+  
+    <article class="gblog-post">
+      <header class="gblog-post__header">
+        <h1 class="gblog-post__title">
+          <a href="/posts/getgcpinfo/">gcp虚拟机信息抓取</a>
+        </h1>
+      </header>
+
+      <section class="gblog-markdown">
+        <div class="flex align-center gblog-post__anchorwrap">
+    <h1 id="基于python3写的抓取gcp虚拟机信息"
+    >
+        基于Python3写的抓取gcp虚拟机信息
+    </h1>
+    <a data-clipboard-text="http://localhost:1313/posts/getgcpinfo/#基于python3写的抓取gcp虚拟机信息" class="gblog-post__anchor clip flex align-center" aria-label="Anchor 基于Python3写的抓取gcp虚拟机信息" href="#%e5%9f%ba%e4%ba%8epython3%e5%86%99%e7%9a%84%e6%8a%93%e5%8f%96gcp%e8%99%9a%e6%8b%9f%e6%9c%ba%e4%bf%a1%e6%81%af">
+        <svg class="gblog-icon gblog_link"><use xlink:href="#gblog_link"></use></svg>
+    </a>
+</div>
+<p>拉取gcp虚拟机信息
+需要调用到基础接口脚本里的数据库读写和google.auth库</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> google.auth <span style="color:#f92672">import</span> compute_engine
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> google.oauth2 <span style="color:#f92672">import</span> service_account
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> googleapiclient.discovery <span style="color:#f92672">import</span> build
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> google.cloud <span style="color:#f92672">import</span> resourcemanager_v3
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> BasicInterfaces <span style="color:#f92672">import</span> executeMysqlData
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> json<span style="color:#f92672">,</span>requests<span style="color:#f92672">,</span>time
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#39;&#39;&#39;拉取 gcp虚拟机信息&#39;&#39;&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#没加入拉取的项目写在这条注释后面</span>
+</span></span><span style="display:flex;"><span>serviceAccount <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&lt;xxx.json&gt;&#39;</span>
+</span></span><span style="display:flex;"><span>credentials <span style="color:#f92672">=</span> service_account<span style="color:#f92672">.</span>Credentials<span style="color:#f92672">.</span>from_service_account_file(serviceAccount)
+</span></span><span style="display:flex;"><span>compute <span style="color:#f92672">=</span> build(<span style="color:#e6db74">&#39;compute&#39;</span>, <span style="color:#e6db74">&#39;v1&#39;</span>,credentials<span style="color:#f92672">=</span> credentials)
+</span></span><span style="display:flex;"><span>project_ids <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;显示名称&#34;</span>:<span style="color:#e6db74">&#34;实际项目名称&#34;</span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> project_id <span style="color:#f92672">in</span> project_ids:
+</span></span><span style="display:flex;"><span>    request <span style="color:#f92672">=</span> compute<span style="color:#f92672">.</span>instances()<span style="color:#f92672">.</span>aggregatedList(project<span style="color:#f92672">=</span> project_ids[project_id])
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># print (request)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> request <span style="color:#f92672">is</span> <span style="color:#f92672">not</span> <span style="color:#66d9ef">None</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>            response <span style="color:#f92672">=</span> request<span style="color:#f92672">.</span>execute()
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span>:
+</span></span><span style="display:flex;"><span>            print (<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34; get project </span><span style="color:#e6db74">{</span>project _ id<span style="color:#e6db74">}</span><span style="color:#e6db74"> information failed! skip... &#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> name, instances_scoped_list <span style="color:#f92672">in</span> response[<span style="color:#e6db74">&#39;items&#39;</span>]<span style="color:#f92672">.</span>items():
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> instance <span style="color:#f92672">in</span> instances_scoped_list<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;instances&#39;</span>,[]):
+</span></span><span style="display:flex;"><span>                hostname <span style="color:#f92672">=</span> instance[<span style="color:#e6db74">&#39;name&#39;</span>]
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;canIpForward&#39;</span> <span style="color:#f92672">in</span> instance:
+</span></span><span style="display:flex;"><span>                    <span style="color:#75715e">#是否有nat</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> instance[<span style="color:#e6db74">&#39;canIpForward&#39;</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;false&#39;</span>:
+</span></span><span style="display:flex;"><span>                        forward <span style="color:#f92672">=</span> θ
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                        forward <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                    forward <span style="color:#f92672">=</span> θ
+</span></span><span style="display:flex;"><span>                zone <span style="color:#f92672">=</span> instance[<span style="color:#e6db74">&#39;zone&#39;</span>]<span style="color:#f92672">.</span>split(ˈ<span style="color:#f92672">/</span>ˈ)[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">for</span> networkInfo <span style="color:#f92672">in</span> instance[ˈnetworkInterfacesˈ]:
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;accessConfigs&#39;</span> <span style="color:#f92672">in</span> networkInfo:
+</span></span><span style="display:flex;"><span>                        <span style="color:#75715e">#查询是否有公网ip</span>
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">for</span> accessConfigInfo <span style="color:#f92672">in</span> networkInfo[<span style="color:#e6db74">&#39;accessConfigs&#39;</span>]:
+</span></span><span style="display:flex;"><span>                            <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;natIP&#39;</span> <span style="color:#f92672">in</span> accessConfigInfo:
+</span></span><span style="display:flex;"><span>                                extip <span style="color:#f92672">=</span> accessConfigInfo[<span style="color:#e6db74">&#39;natIP&#39;</span>]
+</span></span><span style="display:flex;"><span>                            <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                                extip <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;None&#39;</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                        extip <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;None&#39;</span>
+</span></span><span style="display:flex;"><span>                    intip <span style="color:#f92672">=</span> networkInfo[<span style="color:#e6db74">&#39;networkIP&#39;</span>]
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;labels&#39;</span> <span style="color:#f92672">in</span> instance:
+</span></span><span style="display:flex;"><span>                    labels <span style="color:#f92672">=</span> json<span style="color:#f92672">.</span> dumps(str(instance[<span style="color:#e6db74">&#39; labels&#39;</span>])<span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#34;&#39;&#34;</span>,<span style="color:#e6db74">&#39;&#34;&#39;</span>))
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                    labels <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;&#34;+ json. dumps(</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">)+ &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;items&#39;</span> <span style="color:#f92672">in</span> instance[<span style="color:#e6db74">&#39;tags&#39;</span>]:
+</span></span><span style="display:flex;"><span>                    tagList <span style="color:#f92672">=</span> instance[<span style="color:#e6db74">&#39;tags&#39;</span>][<span style="color:#e6db74">&#39;items&#39;</span>]
+</span></span><span style="display:flex;"><span>                    tag <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;.&#39;</span><span style="color:#f92672">.</span> join(tagList)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                    tag <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39; None&#39;</span>
+</span></span><span style="display:flex;"><span>                id <span style="color:#f92672">=</span> instance[<span style="color:#e6db74">&#39;id&#39;</span>]
+</span></span><span style="display:flex;"><span>                machineType <span style="color:#f92672">=</span> instance[<span style="color:#e6db74">&#39;machineType&#39;</span>]<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;/&#39;</span>)[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># print (f&#39; project:{project _ id}, name:{hostname}, forward:{forward}, zone:{zone}, extip:{extip},intip:{intip}, labels:{labels}, tags={tag}, id={id}&#39;)</span>
+</span></span><span style="display:flex;"><span>                sqlForCheckDup <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;&#34;&#34; select * from gcpinfo where project=</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> project_id <span style="color:#f92672">+</span><span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> and name=</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> hostname <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>                result <span style="color:#f92672">=</span> executeMysqlData(<span style="color:#ae81ff">1</span>,<span style="color:#e6db74">&#39;read&#39;</span>,sqlForCheckDup)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> len(result) <span style="color:#f92672">==</span> θ:
+</span></span><span style="display:flex;"><span>                    print (<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;插入新数据</span><span style="color:#e6db74">{</span>extip<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>                    sql<span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;&#34;&#34;insert into gcpinfo(project, name, extip, intip, forward, label, tags, machinetype,cloud) VALUES(</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> project_id <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> hostname <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> extip <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#f92672">+</span> intip <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span>forward<span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span>labels<span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> tag <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> machineType <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,&#39;gcp&#39;)&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#75715e"># print (sql)</span>
+</span></span><span style="display:flex;"><span>                    executeMysqlData(<span style="color:#ae81ff">1</span>,<span style="color:#e6db74">&#39; write&#39;</span>, sql)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                    print (<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;更新新数据</span><span style="color:#e6db74">{</span>extip<span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">{</span>labels<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>                    sqlForUpdate <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;&#34;&#34; update gcpinfo set extip=</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> extip <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,intip=</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> intip<span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,label=</span><span style="color:#e6db74">{</span>labels<span style="color:#e6db74">}</span><span style="color:#e6db74">,tags=</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> tags <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,machineType=</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> machineType <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> WHERE project = </span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> project_id <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> and name=</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> hostname <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>                    executeMysqlData(<span style="color:#ae81ff">1</span>,<span style="color:#e6db74">&#39;write&#39;</span>,sqlForUpdate)
+</span></span><span style="display:flex;"><span>        request <span style="color:#f92672">=</span> compute<span style="color:#f92672">.</span>instances()<span style="color:#f92672">.</span>aggregatedList_next(previous_request<span style="color:#f92672">=</span>request,previous_response<span style="color:#f92672">=</span>response)
+</span></span></code></pre></div><p><img
+  src="/checkGCP/1.png"
+  alt="blog-site"
+  title="检查服务器软件"
 /></p>
-<p>静态博客系统的原理，就如同这篇教程，我创作时，写的是 Markdown 文件（<a
-  class="gblog-markdown__link"
-  href="https://raw.githubusercontent.com/jijiechen/static-blog-manual/master/readme.md"
->readme.md</a>），但你看到的确实是带有格式和交互的网页。因为这背后，有 GitHub 在帮我完成了从静态 Markdown 到静态 HTML 的转换。</p>
-<p>如果要搭建一个静态博客网站，我们需要的工具有：</p>
-<ul>
-<li>把 Markdown 转化为 HTML 的工具（即静态网站生成工具）</li>
-<li>博客样式主题（通常与工具是配套的，一般来说找到了生成工具就找到了主题）</li>
-<li>能存储和发布静态文件的平台</li>
-</ul>
-<p>常用的静态网站生成工具有 <a
-  class="gblog-markdown__link"
-  href="https://jekyllrb.com/"
->jekyll</a>, <a
-  class="gblog-markdown__link"
-  href="https://hexo.io/"
->hexo</a> 和 <a
-  class="gblog-markdown__link"
-  href="https://gohugo.io/"
->hugo</a> 等。接下来，我以 hugo 的使用为例介绍如何搭建一个静态博客网站。</p>
       </section>
       <div class="gblog-post__readmore">
         
           <a
             class="flex-inline align-center fake-link"
             title="Read full post"
-            href="/posts/howtouse/"
+            href="/posts/getgcpinfo/"
           >
             Read full post
             <i class="gblog-icon">gblog_arrow_right</i>
@@ -333,9 +1077,357 @@
           <span class="flex align-center no-wrap gblog-post__meta--update">
   <svg class="gblog-icon gblog_date"><use xlink:href="#gblog_date"></use></svg>
   <span class="gblog-post__tag">
-    <time datetime="2025-02-08T14:00:00&#43;08:00">
+    <time datetime="2025-02-10T10:00:00&#43;08:00">
       
-      Feb 8, 2025
+      Feb 10, 2025
+    </time>
+  </span>
+</span>
+
+<span class="flex align-center no-wrap gblog-post__meta--readtime">
+  <svg class="gblog-icon gblog_timer"><use xlink:href="#gblog_timer"></use></svg>
+  <span class="gblog-post__tag">2 min read</span>
+</span>
+
+
+
+
+
+
+
+
+  
+    
+    
+      
+        <span class="flex align-center no-wrap gblog-post__meta--tag">
+          <svg class="gblog-icon gblog_bookmark"><use xlink:href="#gblog_bookmark"></use></svg>
+          
+  <span class="gblog-post__tag gblog-button gblog-button--regular">
+    <a
+      class="gblog-button__link"
+      href="/tags/python/"
+      title="All posts tagged with 'Python'"
+    >
+      Python
+    </a>
+  </span>
+
+        </span>
+      
+    
+    
+  
+
+
+
+
+
+
+        </div>
+      </footer>
+    </article>
+  
+    <article class="gblog-post">
+      <header class="gblog-post__header">
+        <h1 class="gblog-post__title">
+          <a href="/posts/getgcpfirewallpolicy/">gcp防火墙信息抓取</a>
+        </h1>
+      </header>
+
+      <section class="gblog-markdown">
+        <div class="flex align-center gblog-post__anchorwrap">
+    <h1 id="基于python3写的抓取gcp防火墙信息"
+    >
+        基于Python3写的抓取gcp防火墙信息
+    </h1>
+    <a data-clipboard-text="http://localhost:1313/posts/getgcpfirewallpolicy/#基于python3写的抓取gcp防火墙信息" class="gblog-post__anchor clip flex align-center" aria-label="Anchor 基于Python3写的抓取gcp防火墙信息" href="#%e5%9f%ba%e4%ba%8epython3%e5%86%99%e7%9a%84%e6%8a%93%e5%8f%96gcp%e9%98%b2%e7%81%ab%e5%a2%99%e4%bf%a1%e6%81%af">
+        <svg class="gblog-icon gblog_link"><use xlink:href="#gblog_link"></use></svg>
+    </a>
+</div>
+<p>拉取gcp防火墙信息
+需要调用到基础接口脚本里的数据库读写和boto3库</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> google.cloud <span style="color:#f92672">import</span> compute _v1
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> google.oauth2 <span style="color:#f92672">import</span> service_account
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> BasicInterfaces <span style="color:#f92672">import</span> executeMysqlData
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">queryFirewallRule</span>(credentials,projectId):
+</span></span><span style="display:flex;"><span>    dictFirewallDetails <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>    client <span style="color:#f92672">=</span> compute_v1<span style="color:#f92672">.</span>FirewallsClient(credentials<span style="color:#f92672">=</span> credentials)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        firewallRuleList <span style="color:#f92672">=</span> client<span style="color:#f92672">.</span> list(project<span style="color:#f92672">=</span>projectId)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span>:
+</span></span><span style="display:flex;"><span>        print (<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;发现没有权限读取配置的 project&#39;</span>)
+</span></span><span style="display:flex;"><span>        dictFirewallDetails <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;projectid&#34;</span>:{<span style="color:#e6db74">&#34;rights&#34;</span>:<span style="color:#e6db74">&#34;no&#34;</span>}}
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> dictFirewallDetails
+</span></span><span style="display:flex;"><span>    portList <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> firewallName <span style="color:#f92672">in</span> firewallRuleList:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;0.0.0.0&#34;</span> <span style="color:#f92672">in</span> firewallName<span style="color:#f92672">.</span>source_ranges <span style="color:#f92672">or</span> <span style="color:#e6db74">&#34;0.0.0.0/0&#34;</span> <span style="color:#f92672">in</span> firewallName<span style="color:#f92672">.</span>source_ranges:
+</span></span><span style="display:flex;"><span>            print (<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;发现存在any的规则!规则名为</span><span style="color:#e6db74">{</span>firewallName<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> len(firewallName<span style="color:#f92672">.</span>allowed)<span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>:
+</span></span><span style="display:flex;"><span>                action <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;allow&#39;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">for</span> context <span style="color:#f92672">in</span> firewallName<span style="color:#f92672">.</span>allowed:
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">for</span> port <span style="color:#f92672">in</span> context<span style="color:#f92672">.</span>ports:
+</span></span><span style="display:flex;"><span>                        portList<span style="color:#f92672">.</span>append(port)
+</span></span><span style="display:flex;"><span>                        protocol <span style="color:#f92672">=</span> context<span style="color:#f92672">.</span>I_p_protocol
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">elif</span> len(firewallName<span style="color:#f92672">.</span> denied) <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>:
+</span></span><span style="display:flex;"><span>                action <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;deny&#39;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">for</span> context <span style="color:#f92672">in</span> firewallName<span style="color:#f92672">.</span>denied:
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">for</span> port <span style="color:#f92672">in</span> context<span style="color:#f92672">.</span>ports:
+</span></span><span style="display:flex;"><span>                        portList<span style="color:#f92672">.</span>append(port)
+</span></span><span style="display:flex;"><span>                        protocol <span style="color:#f92672">=</span> context<span style="color:#f92672">.</span>I_p_protocol
+</span></span><span style="display:flex;"><span>            portStr <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;,&#39;</span><span style="color:#f92672">.</span>join(portList)
+</span></span><span style="display:flex;"><span>            dictFirewallDetails[firewallName<span style="color:#f92672">.</span>name] <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;direction&#34;</span>:firewallName<span style="color:#f92672">.</span>direction, 
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;action&#34;</span>: action,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;port&#34;</span>:portStr,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;protocol&#34;</span>: protocol
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            portList <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> dictFirewallDetails
+</span></span><span style="display:flex;"><span>project_ids <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;&lt;项目显示名称&gt;&#34;</span>:<span style="color:#e6db74">&#34;&lt;项目实际名称&gt;&#34;</span>}
+</span></span><span style="display:flex;"><span>credentials <span style="color:#f92672">=</span> service_account<span style="color:#f92672">.</span>Credentials<span style="color:#f92672">.</span>from_service_account_file(<span style="color:#e6db74">&#39;&lt;xxxx.json&gt;&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> project_ids:
+</span></span><span style="display:flex;"><span>    print (<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;开始扫描 project:</span><span style="color:#e6db74">{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> queryFirewallRule(credentials, project_ids[i])
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> ruleName <span style="color:#f92672">in</span> result:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;rights&#39;</span> <span style="color:#f92672">not</span> <span style="color:#f92672">in</span> result[ruleName]:
+</span></span><span style="display:flex;"><span>            sql<span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;&#34;&#34;INSERT INTO gcpfirewall (project, rulename, action, direction, protocol, ports, cloud) VALUES (</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> i <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> ruleName <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> result[ruleName][<span style="color:#e6db74">&#39;action&#39;</span>] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span>result[ruleName][<span style="color:#e6db74">&#39;port&#39;</span>][<span style="color:#ae81ff">0</span>:<span style="color:#ae81ff">280</span>] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,&#39;GCP&#39;)&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            sql<span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;&#34;&#34;INSERT INTO gcpfirewall (project, rulename, cloud) VALUES(</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> i <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,&#39;unknown&#39;,&#39;GCP&#39;)&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        executeMysqlData(<span style="color:#ae81ff">1</span>,<span style="color:#e6db74">&#39;write&#39;</span>, sql)
+</span></span></code></pre></div>
+      </section>
+      <div class="gblog-post__readmore">
+        
+      </div>
+
+      <footer class="gblog-post__footer">
+        <div class="flex flex-wrap align-center gblog-post__meta">
+          <span class="flex align-center no-wrap gblog-post__meta--update">
+  <svg class="gblog-icon gblog_date"><use xlink:href="#gblog_date"></use></svg>
+  <span class="gblog-post__tag">
+    <time datetime="2025-02-10T10:00:00&#43;08:00">
+      
+      Feb 10, 2025
+    </time>
+  </span>
+</span>
+
+<span class="flex align-center no-wrap gblog-post__meta--readtime">
+  <svg class="gblog-icon gblog_timer"><use xlink:href="#gblog_timer"></use></svg>
+  <span class="gblog-post__tag">1 min read</span>
+</span>
+
+
+
+
+
+
+
+
+  
+    
+    
+      
+        <span class="flex align-center no-wrap gblog-post__meta--tag">
+          <svg class="gblog-icon gblog_bookmark"><use xlink:href="#gblog_bookmark"></use></svg>
+          
+  <span class="gblog-post__tag gblog-button gblog-button--regular">
+    <a
+      class="gblog-button__link"
+      href="/tags/python/"
+      title="All posts tagged with 'Python'"
+    >
+      Python
+    </a>
+  </span>
+
+        </span>
+      
+    
+    
+  
+
+
+
+
+
+
+        </div>
+      </footer>
+    </article>
+  
+    <article class="gblog-post">
+      <header class="gblog-post__header">
+        <h1 class="gblog-post__title">
+          <a href="/posts/hfish_alerts/">hfish告警脚本</a>
+        </h1>
+      </header>
+
+      <section class="gblog-markdown">
+        <div class="flex align-center gblog-post__anchorwrap">
+    <h1 id="基于python3写的hfish告警"
+    >
+        基于Python3写的hfish告警
+    </h1>
+    <a data-clipboard-text="http://localhost:1313/posts/hfish_alerts/#基于python3写的hfish告警" class="gblog-post__anchor clip flex align-center" aria-label="Anchor 基于Python3写的hfish告警" href="#%e5%9f%ba%e4%ba%8epython3%e5%86%99%e7%9a%84hfish%e5%91%8a%e8%ad%a6">
+        <svg class="gblog-icon gblog_link"><use xlink:href="#gblog_link"></use></svg>
+    </a>
+</div>
+<p>由于原告警是excel文件不方便阅读，故写了个比较直观的脚本，并且当时环境是部署在gcp上的，故联动gcp接口调用防火墙黑名单
+需要调用到基础接口脚本里的数据库读写和google.cloud库</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> requests.packages <span style="color:#f92672">import</span> urllib3
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time<span style="color:#f92672">,</span>re<span style="color:#f92672">,</span>json<span style="color:#f92672">,</span>logging
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> google.cloud <span style="color:#f92672">import</span> compute _v1
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> google. oauth2 <span style="color:#f92672">import</span> service_account
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> BasicInterfaces <span style="color:#f92672">import</span> executeMysqlData
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> datetime <span style="color:#f92672">import</span> datetime,timedelta
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">listFirewallRule</span>(credentials,projectId):
+</span></span><span style="display:flex;"><span>    client <span style="color:#f92672">=</span> compute _v1<span style="color:#f92672">.</span>FirewallsClient(credentials<span style="color:#f92672">=</span> credentials)
+</span></span><span style="display:flex;"><span>    firewallRuleList <span style="color:#f92672">=</span> client<span style="color:#f92672">.</span>list(project<span style="color:#f92672">=</span>projectId)
+</span></span><span style="display:flex;"><span>    query <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;blocklist&#34;</span>
+</span></span><span style="display:flex;"><span>    dataJson <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>    ipList <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> firewallName <span style="color:#f92672">in</span> firewallRuleList:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> query <span style="color:#f92672">in</span> firewallName<span style="color:#f92672">.</span>name:
+</span></span><span style="display:flex;"><span>            dataJson[firewallName<span style="color:#f92672">.</span>name] <span style="color:#f92672">=</span> len(firewallName<span style="color:#f92672">.</span>source_ranges)
+</span></span><span style="display:flex;"><span>            ipList<span style="color:#f92672">.</span> extend(firewallName<span style="color:#f92672">.</span>source_ranges)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> dataJson,ipList
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">addSourceIPToFirewallRule</span>(credentials,projectId, firewallRuleName,ipaddressForAdd):
+</span></span><span style="display:flex;"><span>    client <span style="color:#f92672">=</span> compute_v1<span style="color:#f92672">.</span>FirewallsClient(credentials<span style="color:#f92672">=</span>credentials)
+</span></span><span style="display:flex;"><span>    firewall <span style="color:#f92672">=</span> client<span style="color:#f92672">.</span>get(project<span style="color:#f92672">=</span>projectId, firewall<span style="color:#f92672">=</span>firewallRuleName)
+</span></span><span style="display:flex;"><span>    firewall<span style="color:#f92672">.</span>source_ranges<span style="color:#f92672">.</span>append(ipaddressForAdd)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        operation <span style="color:#f92672">=</span> client<span style="color:#f92672">.</span>update(project<span style="color:#f92672">=</span>projectId, firewall<span style="color:#f92672">=</span>firewallRuleName,firewall_resource<span style="color:#f92672">=</span>firewall)
+</span></span><span style="display:flex;"><span>        operation<span style="color:#f92672">.</span>result()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> str(e)<span style="color:#f92672">.</span>split()[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">removeSourceIPToFirewallRule</span>(credentials,projectId, firewallRuleName,ipaddressForAdd):
+</span></span><span style="display:flex;"><span>    client <span style="color:#f92672">=</span> compute _v1<span style="color:#f92672">.</span>FirewallsClient(credentials<span style="color:#f92672">=</span> credentials)
+</span></span><span style="display:flex;"><span>    firewall <span style="color:#f92672">=</span> client<span style="color:#f92672">.</span>get(project<span style="color:#f92672">=</span>projectId, firewall<span style="color:#f92672">=</span>firewallRuleName)
+</span></span><span style="display:flex;"><span>    firewall<span style="color:#f92672">.</span>source_ranges<span style="color:#f92672">.</span>remove(ipaddressForAdd)
+</span></span><span style="display:flex;"><span>    operation <span style="color:#f92672">=</span> client<span style="color:#f92672">.</span>update(project<span style="color:#f92672">=</span>projectId, firewall<span style="color:#f92672">=</span>firewallRuleName, firewall_resource<span style="color:#f92672">=</span> firewall)
+</span></span><span style="display:flex;"><span>    operation<span style="color:#f92672">.</span>result()
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">newFirewallPolicy</span>(credentials,projectId, firewallRuleName):
+</span></span><span style="display:flex;"><span>    client <span style="color:#f92672">=</span> compute_v1<span style="color:#f92672">.</span>FirewallsClient(credentials<span style="color:#f92672">=</span> credentials)
+</span></span><span style="display:flex;"><span>    firewall <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;denied&#34;</span>: [{<span style="color:#e6db74">&#34;I_p_protocol&#34;</span>: <span style="color:#e6db74">&#34;all&#34;</span>}],
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;direction&#34;</span>: <span style="color:#e6db74">&#34;INGRESS&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;name&#34;</span>: firewallRuleName,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;network&#34;</span>: <span style="color:#e6db74">&#34;global/networks/ default&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;priority&#34;</span>: <span style="color:#ae81ff">999</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;source_ranges&#34;</span>: [<span style="color:#e6db74">&#34;224.1.1.132/32&#34;</span>]
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        client<span style="color:#f92672">.</span>insert(project<span style="color:#f92672">=</span>projectId, firewall_resource <span style="color:#f92672">=</span> firewall)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">True</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> (str(e)<span style="color:#f92672">.</span>split()[<span style="color:#f92672">-</span><span style="color:#ae81ff">2</span>] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34; &#34;</span> <span style="color:#f92672">+</span> str(e)<span style="color:#f92672">.</span>split()[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>])
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">isPublicIpv4</span>(ip):
+</span></span><span style="display:flex;"><span>    pattern <span style="color:#f92672">=</span> <span style="color:#e6db74">r</span><span style="color:#e6db74">&#39;^(?:(?:(?:[1-9]?\d|1\d\d|2[θ-4]\d|25[θ-5])\.)</span><span style="color:#e6db74">{3}</span><span style="color:#e6db74">(?:[1-9]?\d|1\d\d|2[θ-4]\d|25[θ-5]))$&#39;</span>
+</span></span><span style="display:flex;"><span>    private_pattern <span style="color:#f92672">=</span> <span style="color:#e6db74">r</span><span style="color:#e6db74">&#39;^(?:(?:10|127)\.\d{1,3}\.\d{1,3}\.\d{1,3}|(?:172\.(?:1[6-9]|2\d|3[01]))\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}</span><span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span><span style="color:#e6db74">    return re.match(pattern, ip) is not None and re.match(private_pattern,ip) is None</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">makeMaiLContext</span>(data):
+</span></span><span style="display:flex;"><span>    table _ html <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &lt;table style=&#34;border-collapse: collapse;&#34;&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &lt;tr bgcolor=&#34;aqua&#34;&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            &lt;th style=&#34; border: 1px solid black; padding: 8px;&#34;&gt;扫描类型&lt;/th&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            &lt;th style=&#34; border: 1px solid black; padding: 8px;&#34;&gt;来源IP&lt;/th&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            &lt;th style=&#34; border: 1px solid black; padding: 8px;&#34;&gt;来源MAC&lt;/th&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            &lt;th style=&#34; border: 1px solid black; padding: 8px;&#34;&gt;来源区域&lt;/th&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            &lt;th style=&#34; border: 1px solid black; padding: 8px;&#34;&gt;目标IP&lt;/th&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            &lt;th style=&#34; border: 1px solid black; padding: 8px;&#34;&gt;目标端口&lt;/th&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            &lt;th style=&#34; border: 1px solid black; padding: 8px;&#34;&gt;扫描次数&lt;/th&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            &lt;th style=&#34; border: 1px solid black; padding: 8px;&#34;&gt;开始时间&lt;/th&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            &lt;th style=&#34; border: 1px solid black; padding: 8px;&#34;&gt;持续时间&lt;/th&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            &lt;th style=&#34; border: 1px solid black; padding: 8px;&#34;&gt;攻击详情&lt;/th&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &lt;/tr&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    ports <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;,&#34;</span><span style="color:#f92672">.</span>join(filter(<span style="color:#66d9ef">None</span>, data[<span style="color:#ae81ff">3</span>]<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#34;,&#34;</span>)))
+</span></span><span style="display:flex;"><span>    table _ html <span style="color:#f92672">+=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &lt;tr&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &lt;td style=&#34; border: 1px solid black; padding: 8px;&#34;&gt;</span><span style="color:#e6db74">{</span>data[<span style="color:#ae81ff">6</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&lt;/td&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &lt;td style=&#34; border: 1px solid black; padding: 8px;&#34;&gt;</span><span style="color:#e6db74">{</span>data[θ]<span style="color:#e6db74">}</span><span style="color:#e6db74">&lt;/td&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &lt;td style=&#34; border: 1px solid black; padding: 8px;&#34;&gt;</span><span style="color:#e6db74">{</span>data[<span style="color:#ae81ff">8</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&lt;/td&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &lt;td style=&#34; border: 1px solid black; padding: 8px;&#34;&gt;</span><span style="color:#e6db74">{</span>data[<span style="color:#ae81ff">1</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&lt;/td&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &lt;td style=&#34; border: 1px solid black; padding: 8px;&#34;&gt;</span><span style="color:#e6db74">{</span>data[<span style="color:#ae81ff">2</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&lt;/td&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &lt;td style=&#34; border: 1px solid black; padding: 8px;&#34;&gt;</span><span style="color:#e6db74">{</span>ports<span style="color:#e6db74">}</span><span style="color:#e6db74">&lt;/td&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &lt;td style=&#34; border: 1px solid black; padding: 8px;&#34;&gt;</span><span style="color:#e6db74">{</span>data[<span style="color:#ae81ff">4</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&lt;/td&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &lt;td style=&#34; border: 1px solid black; padding: 8px;&#34;&gt;</span><span style="color:#e6db74">{</span>data[<span style="color:#ae81ff">7</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&lt;/td&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &lt;td style=&#34; border: 1px solid black; padding: 8px;&#34;&gt;</span><span style="color:#e6db74">{</span>data[<span style="color:#ae81ff">5</span>]<span style="color:#f92672">.</span>total_seconds()<span style="color:#e6db74">}</span><span style="color:#e6db74">&lt;/td&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &lt;td style=&#34; border: 1px solid black; padding: 8px;&#34;&gt;</span><span style="color:#e6db74">{</span>data[<span style="color:#ae81ff">9</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&lt;/td&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &lt;/tr&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    table_html <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;&lt;/table&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> (table_html)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">beijing</span>(sec, what):
+</span></span><span style="display:flex;"><span>    beijing_time <span style="color:#f92672">=</span> datetime<span style="color:#f92672">.</span>now()<span style="color:#f92672">+</span> timedelta(hours<span style="color:#f92672">=</span><span style="color:#ae81ff">8</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> beijing_time<span style="color:#f92672">.</span>timetuple()
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;蜜罐收集黑名单&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>logging<span style="color:#f92672">.</span>basicConfig(level<span style="color:#f92672">=</span>logging<span style="color:#f92672">.</span>INFO, format<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">%(asctime)s</span><span style="color:#e6db74"> - </span><span style="color:#e6db74">%(message)s</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>logger <span style="color:#f92672">=</span> logging<span style="color:#f92672">.</span>getLogger()
+</span></span><span style="display:flex;"><span>logging<span style="color:#f92672">.</span>Formatter<span style="color:#f92672">.</span>converter <span style="color:#f92672">=</span> beijingprojectCSTId <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;xxxx&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Google Cloud项目ID</span>
+</span></span><span style="display:flex;"><span>credentialsCST <span style="color:#f92672">=</span> service_account<span style="color:#f92672">.</span>Credentials<span style="color:#f92672">.</span>from_service_account_file(<span style="color:#e6db74">&#39;dddd.json&#39;</span>)projectIdList <span style="color:#f92672">=</span> [{<span style="color:#e6db74">&#39;projectId&#39;</span>:projectCSTId,<span style="color:#e6db74">&#39; credentials&#39;</span>:credentialsCST}]
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#遍历 project列表</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">while</span> <span style="color:#ae81ff">1</span>:
+</span></span><span style="display:flex;"><span>    logger<span style="color:#f92672">.</span>info(<span style="color:#e6db74">&#39;开始新一轮扫描&#39;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> projectInfo <span style="color:#f92672">in</span> projectIdList:
+</span></span><span style="display:flex;"><span>        firewallInfo,sourceRange <span style="color:#f92672">=</span> listFirewallRule(project Info[<span style="color:#e6db74">&#39;credentials&#39;</span>],projectInfo[<span style="color:#e6db74">&#39;projectId&#39;</span>])[θ],listFirewallRule(projectInfo[<span style="color:#e6db74">&#39;credentials&#39;</span>],projectInfo[<span style="color:#e6db74">&#39;projectId&#39;</span>])[<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> firewallName <span style="color:#f92672">in</span> firewallInfo:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> firewallInfo[firewallName] <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">5000</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>            queryScanData <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;SELECT source_ip,source_ip_country,dest_ip,GROUP_CONCAT(DISTINCT dest_port),count(*) AS ipCount,TIMEDIFF(MAX(update_time),MIN(create_time)),GROUP_CONCAT(DISTINCT scan_type),create_time,source_mac,detail FROM scanners WHERE ifAlreadysent=0 GROUP BY source_ip&#34;</span>
+</span></span><span style="display:flex;"><span>            scanpata <span style="color:#f92672">=</span> executeMysqivata(<span style="color:#ae81ff">1</span>,<span style="color:#e6db74">&#39; read&#39;</span>, queryscanData)
+</span></span><span style="display:flex;"><span>            logger<span style="color:#f92672">.</span>info  (<span style="color:#e6db74">&#34;开始扫描数据库,看是否有新的ip&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> len(scanData) <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>:
+</span></span><span style="display:flex;"><span>                logger<span style="color:#f92672">.</span>info  (<span style="color:#e6db74">&#39;本次扫描没有发现新的ip&#39;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">for</span> j <span style="color:#f92672">in</span> scanData:
+</span></span><span style="display:flex;"><span>                    logger<span style="color:#f92672">.</span>info (j[<span style="color:#ae81ff">0</span>])
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> isPublicIpv4(j[<span style="color:#ae81ff">0</span>]) <span style="color:#f92672">==</span> <span style="color:#66d9ef">True</span>:
+</span></span><span style="display:flex;"><span>                        <span style="color:#75715e">###这边判断是否是自己的ip</span>
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">if</span> j[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#39;x.x.x.x&#39;</span>:
+</span></span><span style="display:flex;"><span>                            dataQuery <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;&#34;&#34;select * from sync_ip_info where ip=</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> j[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>                            queryDupIp <span style="color:#f92672">=</span> executeMysqlData(<span style="color:#ae81ff">1</span>,<span style="color:#e6db74">&#39;read&#39;</span>,dataQuery)
+</span></span><span style="display:flex;"><span>                            <span style="color:#66d9ef">if</span> len(queryDupIp) <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>:
+</span></span><span style="display:flex;"><span>                                resultAddIP <span style="color:#f92672">=</span> addSourceIPToFirewallRule(projectInfo[<span style="color:#e6db74">&#39;credentials&#39;</span>],projectInfo[<span style="color:#e6db74">&#39;projectId&#39;</span>],firewallName,j[<span style="color:#ae81ff">0</span>])
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">if</span> resultAddIP <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;5001.&#39;</span>:
+</span></span><span style="display:flex;"><span>                                    logger<span style="color:#f92672">.</span>info  (<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;防火墙规则已满,尝试创建新的规则&#39;</span>)
+</span></span><span style="display:flex;"><span>                                    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range (<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">1000</span>):
+</span></span><span style="display:flex;"><span>                                        firewallRuleName <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;blocklist&#34;</span> <span style="color:#f92672">+</span> str(i)
+</span></span><span style="display:flex;"><span>                                        resultAddPolicy <span style="color:#f92672">=</span> newFirewallPolicy(credentialsCST,projectCSTId,firewallRuleName)
+</span></span><span style="display:flex;"><span>                                        <span style="color:#66d9ef">if</span> resultAddPolicy <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;already exists&#39;</span>:
+</span></span><span style="display:flex;"><span>                                            logger<span style="color:#f92672">.</span>info(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;防火墙</span><span style="color:#e6db74">{</span>firewallRuleName<span style="color:#e6db74">}</span><span style="color:#e6db74">已经存在,尝试下一个。。。&#39;</span>)
+</span></span><span style="display:flex;"><span>                                            i <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>                                            <span style="color:#66d9ef">else</span>:logger<span style="color:#f92672">.</span>info  (<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;防火墙</span><span style="color:#e6db74">{</span>firewallRuleName<span style="color:#e6db74">}</span><span style="color:#e6db74">创建成功!&#39;</span>)
+</span></span><span style="display:flex;"><span>                                            addSourceIPToFirewallRule(projectInfo[<span style="color:#e6db74">&#39;credentials&#39;</span>],projectInfo[<span style="color:#e6db74">&#39;projectId&#39;</span>],firewallName,j[<span style="color:#ae81ff">0</span>])
+</span></span><span style="display:flex;"><span>                                            <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>                                        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                                            logger<span style="color:#f92672">.</span>info(<span style="color:#e6db74">&#39;防火墙规则写入成功&#39;</span>)
+</span></span><span style="display:flex;"><span>                                            dataInsert <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;&#34;&#34;insert into sync_ip_info(ip, sync) VALUES (</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#f92672">+</span> j[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,&#39;honeypotserver&#39;)&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>                                            executeMysqlData(<span style="color:#ae81ff">1</span>,<span style="color:#e6db74">&#39;write&#39;</span>,dataInsert)
+</span></span><span style="display:flex;"><span>                                            logger<span style="color:#f92672">.</span>info(<span style="color:#e6db74">&#34;数据写入成功&#34;</span>)
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                                    logger<span style="color:#f92672">.</span>info(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;该ip</span><span style="color:#e6db74">{</span>j[<span style="color:#ae81ff">0</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">已经写入数据库!&#39;</span>)
+</span></span><span style="display:flex;"><span>                            <span style="color:#66d9ef">else</span>:logger<span style="color:#f92672">.</span>info  (<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;ip</span><span style="color:#e6db74">{</span>j[<span style="color:#ae81ff">0</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">是公司IP,请注意检查!&#39;</span>)
+</span></span><span style="display:flex;"><span>        time<span style="color:#f92672">.</span>sleep(<span style="color:#ae81ff">60</span>)
+</span></span></code></pre></div>
+      </section>
+      <div class="gblog-post__readmore">
+        
+      </div>
+
+      <footer class="gblog-post__footer">
+        <div class="flex flex-wrap align-center gblog-post__meta">
+          <span class="flex align-center no-wrap gblog-post__meta--update">
+  <svg class="gblog-icon gblog_date"><use xlink:href="#gblog_date"></use></svg>
+  <span class="gblog-post__tag">
+    <time datetime="2025-02-10T10:00:00&#43;08:00">
+      
+      Feb 10, 2025
     </time>
   </span>
 </span>
@@ -362,10 +1454,10 @@
   <span class="gblog-post__tag gblog-button gblog-button--regular">
     <a
       class="gblog-button__link"
-      href="/tags/hugo/"
-      title="All posts tagged with 'hugo'"
+      href="/tags/python/"
+      title="All posts tagged with 'Python'"
     >
-      hugo
+      Python
     </a>
   </span>
 
@@ -374,11 +1466,256 @@
     
     
   
-    
-    
-    
+
+
+
+
+
+
+        </div>
+      </footer>
+    </article>
+  
+    <article class="gblog-post">
+      <header class="gblog-post__header">
+        <h1 class="gblog-post__title">
+          <a href="/posts/requestnmap/">nmap扫描</a>
+        </h1>
+      </header>
+
+      <section class="gblog-markdown">
+        <div class="flex align-center gblog-post__anchorwrap">
+    <h1 id="基于python3写的nmap扫描接口仅用作代理"
+    >
+        基于Python3写的nmap扫描接口，仅用作代理
+    </h1>
+    <a data-clipboard-text="http://localhost:1313/posts/requestnmap/#基于python3写的nmap扫描接口仅用作代理" class="gblog-post__anchor clip flex align-center" aria-label="Anchor 基于Python3写的nmap扫描接口，仅用作代理" href="#%e5%9f%ba%e4%ba%8epython3%e5%86%99%e7%9a%84nmap%e6%89%ab%e6%8f%8f%e6%8e%a5%e5%8f%a3%e4%bb%85%e7%94%a8%e4%bd%9c%e4%bb%a3%e7%90%86">
+        <svg class="gblog-icon gblog_link"><use xlink:href="#gblog_link"></use></svg>
+    </a>
+</div>
+<p>基于Python3写的nmap扫描接口，仅用作代理</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> nmap<span style="color:#f92672">,</span>json<span style="color:#f92672">,</span> requests<span style="color:#f92672">,</span> os<span style="color:#f92672">,</span> time<span style="color:#f92672">,</span> re<span style="color:#f92672">,</span> socket
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> flask <span style="color:#f92672">import</span> Flask, request, jsonify, send_file
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> typing <span style="color:#f92672">import</span> Dict
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> BasicInterfaces <span style="color:#f92672">import</span> executeMysqlData
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> PyNuclei <span style="color:#f92672">import</span> Nuclei
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#39;&#39;&#39;http接口供 nmap和 gcp日志下载使用&#39;&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>nm <span style="color:#f92672">=</span> nmap<span style="color:#f92672">.</span>PortScanner()
+</span></span><span style="display:flex;"><span>nucleiScanner <span style="color:#f92672">=</span> Nuclei()
+</span></span><span style="display:flex;"><span>app <span style="color:#f92672">=</span> Flask(__name__)
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#39;&#39;&#39;nmap扫描功能&#39;&#39;&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/&#39;</span>, methods<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;POST&#39;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">json_post</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#使用 flask开启 http服务, 用来接收 text格式的 ip地址</span>
+</span></span><span style="display:flex;"><span>    ip <span style="color:#f92672">=</span> str(request<span style="color:#f92672">.</span>data, encoding<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;utf-8&#39;</span>)
+</span></span><span style="display:flex;"><span>    dataJson <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>    dataJson[ip] <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>    print (<span style="color:#e6db74">&#39;正在扫描</span><span style="color:#e6db74">%s</span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">%</span> ip)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#开始调用nmap进行扫描，超时时间1200秒，1200秒后强制结束扫描进程</span>
+</span></span><span style="display:flex;"><span>    result<span style="color:#f92672">=</span> nm<span style="color:#f92672">.</span>scan(ip, arguments<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;-T5 - n - sT - Pn - p-&#39;</span>, timeout <span style="color:#f92672">=</span> <span style="color:#ae81ff">1200</span>)
+</span></span><span style="display:flex;"><span>    dataJson[ip][<span style="color:#e6db74">&#39;portstatus&#39;</span>]<span style="color:#f92672">=</span>{}
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> result[<span style="color:#e6db74">&#39;nmap&#39;</span>][<span style="color:#e6db74">&#39;scanstats&#39;</span>][<span style="color:#e6db74">&#39;uphosts&#39;</span>] <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#39;θ&#39;</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> j <span style="color:#f92672">in</span> result[<span style="color:#e6db74">&#39;scan&#39;</span>][ip][<span style="color:#e6db74">&#39;tcp&#39;</span>]:
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> result[<span style="color:#e6db74">&#39;scan&#39;</span>][ip][<span style="color:#e6db74">&#39;tcp&#39;</span>][j][<span style="color:#e6db74">&#39;state&#39;</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;open&#39;</span>:
+</span></span><span style="display:flex;"><span>                    print (<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;发现开放端口</span><span style="color:#e6db74">{</span>j<span style="color:#e6db74">}</span><span style="color:#e6db74">,正在详细扫描该端口。。。&#39;</span>)
+</span></span><span style="display:flex;"><span>                    doubleScan <span style="color:#f92672">=</span> nm<span style="color:#f92672">.</span>scan(ip, arguments<span style="color:#f92672">=</span><span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;-T5 - n - sV - Pn - p </span><span style="color:#e6db74">{</span>j<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>, timeout <span style="color:#f92672">=</span> <span style="color:#ae81ff">1200</span>)
+</span></span><span style="display:flex;"><span>                    print (<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;端口扫描结果为</span><span style="color:#e6db74">{</span>doubleScan<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>                    resultDict <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>                    resultDict[<span style="color:#e6db74">&#39;service&#39;</span>] <span style="color:#f92672">=</span> doubleScan[<span style="color:#e6db74">&#39;scan&#39;</span>][ip][<span style="color:#e6db74">&#39;tcp&#39;</span>][j][<span style="color:#e6db74">&#39;name&#39;</span>]
+</span></span><span style="display:flex;"><span>                    resultDict[<span style="color:#e6db74">&#39;application&#39;</span>] <span style="color:#f92672">=</span> doubleScan[<span style="color:#e6db74">&#39;scan&#39;</span>][ip][<span style="color:#e6db74">&#39;tcp&#39;</span>][j][<span style="color:#e6db74">&#39;product&#39;</span>]
+</span></span><span style="display:flex;"><span>                    dataJson[ip][<span style="color:#e6db74">&#39;portstatus&#39;</span>][j] <span style="color:#f92672">=</span> resultDict
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">return</span> jsonify(dataJson)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;False&#39;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;False&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#39;&#39;&#39;域名扫描功能&#39;&#39;&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/scan/&lt;domain&gt;&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">scan</span>(domain: str):
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>    headers <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;mobile&#34;</span>:{<span style="color:#e6db74">&#34;User-Agent&#34;</span>: <span style="color:#e6db74">&#34;Mozilla/5.θ (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/6θ4.1&#34;</span>}, <span style="color:#e6db74">&#34; pc&#34;</span>: {<span style="color:#e6db74">&#34; User-Agent&#34;</span>:<span style="color:#e6db74">&#34; Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36(KHTML, like Gecko) Chrome/78.0.3984.108 Safari/537.36&#34;</span>}}
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> headers:
+</span></span><span style="display:flex;"><span>        scanResult <span style="color:#f92672">=</span> nucleiScanner<span style="color:#f92672">.</span>scan(
+</span></span><span style="display:flex;"><span>            host <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>domain<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>,
+</span></span><span style="display:flex;"><span>            userAgent<span style="color:#f92672">=</span> headers[i],
+</span></span><span style="display:flex;"><span>            rateLimit<span style="color:#f92672">=</span><span style="color:#ae81ff">150</span>,
+</span></span><span style="display:flex;"><span>            verbose<span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>,
+</span></span><span style="display:flex;"><span>            metrics<span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>,
+</span></span><span style="display:flex;"><span>            maxHostError<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span>θ,
+</span></span><span style="display:flex;"><span>            stopAfter<span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>
+</span></span><span style="display:flex;"><span>            )
+</span></span><span style="display:flex;"><span>        result[i]<span style="color:#f92672">=</span>scanResult
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> result
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#39;&#39;&#39; cve查询功能&#39;&#39;&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/versioncheck/&lt; domainname&gt;&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">versioncheck</span>(domainname):
+</span></span><span style="display:flex;"><span>    dataJson <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>    dataJson[domainname] <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        dataJson[domainname][<span style="color:#e6db74">&#39;ip&#39;</span>] <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>gethostbyname(domainname)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span>:
+</span></span><span style="display:flex;"><span>        dataJson[domainname][<span style="color:#e6db74">&#39;ip&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;unknown&#39;</span>
+</span></span><span style="display:flex;"><span>    url<span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;https://</span><span style="color:#e6db74">{</span>domainname<span style="color:#e6db74">}</span><span style="color:#e6db74">/version.txt&#34;</span>
+</span></span><span style="display:flex;"><span>    headers <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;mobile&#34;</span>:{<span style="color:#e6db74">&#34;User-Agent&#34;</span>: <span style="color:#e6db74">&#34;Mozilla/5.θ (iPhone; CPU iPhone OS 13_2_3 like Mac OS X)AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/684.1&#34;</span>}, <span style="color:#e6db74">&#34;pc&#34;</span>:  {<span style="color:#e6db74">&#34;User-Agent&#34;</span>:<span style="color:#e6db74">&#34; Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36(KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36&#34;</span>}}
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> headers:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>            response <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>get(url, headers<span style="color:#f92672">=</span> headers[i])
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>        dataJson[domainname][i]<span style="color:#f92672">=</span>{}
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;response&#39;</span> <span style="color:#f92672">in</span> locals():
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> response<span style="color:#f92672">.</span>status_code <span style="color:#f92672">==</span> <span style="color:#ae81ff">200</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;&lt;&#39;</span> <span style="color:#f92672">not</span> <span style="color:#f92672">in</span> response<span style="color:#f92672">.</span>text:
+</span></span><span style="display:flex;"><span>                    response <span style="color:#f92672">=</span> response<span style="color:#f92672">.</span>text
+</span></span><span style="display:flex;"><span>                    filteredText <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span><span style="color:#f92672">.</span> join([line <span style="color:#66d9ef">for</span> line <span style="color:#f92672">in</span> response<span style="color:#f92672">.</span>splitlines() <span style="color:#66d9ef">if</span><span style="color:#e6db74">&#34;committer&#34;</span> <span style="color:#f92672">not</span> <span style="color:#f92672">in</span>  line])
+</span></span><span style="display:flex;"><span>                    matches <span style="color:#f92672">=</span> re<span style="color:#f92672">.</span>findall(<span style="color:#e6db74">r</span><span style="color:#e6db74">&#34;:\s*(.+)&#34;</span>, filteredText)
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>                        dataJson[domainname][i][<span style="color:#e6db74">&#39;project&#39;</span>] <span style="color:#f92672">=</span> matches[θ]
+</span></span><span style="display:flex;"><span>                        dataJson[domainname][i][<span style="color:#e6db74">&#39;version&#39;</span>] <span style="color:#f92672">=</span> matches[<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>                        dataJson[domainname][i][<span style="color:#e6db74">&#39;buildtime&#39;</span>] <span style="color:#f92672">=</span> matches[<span style="color:#ae81ff">2</span>]
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">except</span>:
+</span></span><span style="display:flex;"><span>                        dataJson[domainname][i][<span style="color:#e6db74">&#39;project&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;unknown&#39;</span>
+</span></span><span style="display:flex;"><span>                        dataJson[domainname][i][<span style="color:#e6db74">&#39;version&#39;</span>] <span style="color:#f92672">=</span> response
+</span></span><span style="display:flex;"><span>                        dataJson[domainname][i][<span style="color:#e6db74">&#39;buildtime&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;unknown&#39;</span>
+</span></span><span style="display:flex;"><span>                    dataJson[domainname][i][<span style="color:#e6db74">&#39;origin&#39;</span>] <span style="color:#f92672">=</span> response
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> jsonify(dataJson)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/cve&#39;</span>, methods<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;POST&#39;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">cveQuery</span>():
+</span></span><span style="display:flex;"><span>    data <span style="color:#f92672">=</span> request<span style="color:#f92672">.</span>get_json()
+</span></span><span style="display:flex;"><span>    software <span style="color:#f92672">=</span> data[<span style="color:#e6db74">&#39;software&#39;</span>]
+</span></span><span style="display:flex;"><span>    version <span style="color:#f92672">=</span> data[<span style="color:#e6db74">&#39;version&#39;</span>]
+</span></span><span style="display:flex;"><span>    startDateFormat <span style="color:#f92672">=</span> data[<span style="color:#e6db74">&#39;starttime&#39;</span>]
+</span></span><span style="display:flex;"><span>    endDateFormat <span style="color:#f92672">=</span> data[<span style="color:#e6db74">&#39;endtime&#39;</span>]
+</span></span><span style="display:flex;"><span>    urlParameter <span style="color:#f92672">=</span> data[<span style="color:#e6db74">&#39;cpe&#39;</span>]
+</span></span><span style="display:flex;"><span>    url<span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;https://services.nvd.nist.gov/rest/json/cves/2.0?cpeName=</span><span style="color:#e6db74">{</span>urlParameter<span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;lastModStartDate=</span><span style="color:#e6db74">{</span>startDateFormat<span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;lastModEndDate=</span><span style="color:#e6db74">{</span>endDateFormat<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>    headers <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#39;apiKey&#39;</span>: <span style="color:#e6db74">&#39;92127066-eb5f-478a-8d92-4978b3f1f9a2&#39;</span><span style="color:#f92672">.</span>}
+</span></span><span style="display:flex;"><span>    n <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> <span style="color:#ae81ff">1</span>:
+</span></span><span style="display:flex;"><span>        response <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>get(url, headers<span style="color:#f92672">=</span> headers)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> response<span style="color:#f92672">.</span> status_code <span style="color:#f92672">!=</span> <span style="color:#ae81ff">484</span> <span style="color:#f92672">and</span> response<span style="color:#f92672">.</span>status_code <span style="color:#f92672">!=</span> <span style="color:#ae81ff">583</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> n <span style="color:#f92672">&lt;</span><span style="color:#ae81ff">4</span>: 
+</span></span><span style="display:flex;"><span>                print (<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;获取失败, 状态码为</span><span style="color:#e6db74">{</span>response<span style="color:#f92672">.</span>status_code<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>                time<span style="color:#f92672">.</span>sleep(<span style="color:#ae81ff">5</span>)
+</span></span><span style="display:flex;"><span>                n <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;no result of that software!&#39;</span>,<span style="color:#ae81ff">404</span>
+</span></span><span style="display:flex;"><span>    response <span style="color:#f92672">=</span> json<span style="color:#f92672">.</span>loads(response<span style="color:#f92672">.</span> text)
+</span></span><span style="display:flex;"><span>    resultJson <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>    resultJson[<span style="color:#e6db74">&#39;software&#39;</span>] <span style="color:#f92672">=</span> software
+</span></span><span style="display:flex;"><span>    resultJson[<span style="color:#e6db74">&#39;version&#39;</span>] <span style="color:#f92672">=</span> version
+</span></span><span style="display:flex;"><span>    cveList <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> response[<span style="color:#e6db74">&#39;vulnerabilities&#39;</span>]:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>            severity <span style="color:#f92672">=</span> i[<span style="color:#e6db74">&#39;cve&#39;</span>][<span style="color:#e6db74">&#39;metrics&#39;</span>][<span style="color:#e6db74">&#39;cvssMetricV31&#39;</span>][θ][<span style="color:#e6db74">&#39;cvssData&#39;</span>][<span style="color:#e6db74">&#39;baseSeverity&#39;</span>]
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span>:
+</span></span><span style="display:flex;"><span>            severity <span style="color:#f92672">=</span> i[<span style="color:#e6db74">&#39;cve&#39;</span>][<span style="color:#e6db74">&#39;metrics&#39;</span>][<span style="color:#e6db74">&#39;cvssMetricV2&#39;</span>][<span style="color:#ae81ff">0</span>][<span style="color:#e6db74">&#39;baseSeverity&#39;</span>]
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> severity <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;HIGH&#39;</span> <span style="color:#f92672">or</span> severity <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;CRITICAL&#34;</span>:
+</span></span><span style="display:flex;"><span>            print (<span style="color:#e6db74">&#39;catch high vuln!&#39;</span>)
+</span></span><span style="display:flex;"><span>            cveID <span style="color:#f92672">=</span> i[<span style="color:#e6db74">&#39;cve&#39;</span>][<span style="color:#e6db74">&#39;id&#39;</span>]
+</span></span><span style="display:flex;"><span>            cveList<span style="color:#f92672">.</span>append(cveID)
+</span></span><span style="display:flex;"><span>    resultJson[<span style="color:#e6db74">&#39;cve&#39;</span>] <span style="color:#f92672">=</span> cveList
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> jsonify(resultJson)
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#39;&#39;&#39;gcp日志下载功能的一部分，用来获取所有日志文件的路径&#39;&#39;&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_all_files</span>(directory):
+</span></span><span style="display:flex;"><span>    file_paths <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> root, dirs, files <span style="color:#f92672">in</span> os<span style="color:#f92672">.</span>walk(directory):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> file <span style="color:#f92672">in</span> files:
+</span></span><span style="display:flex;"><span>            file_path <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>relpath(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(root,file), <span style="color:#e6db74">&#34;directory&#34;</span>)
+</span></span><span style="display:flex;"><span>            file_paths<span style="color:#f92672">.</span>append(file_path<span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">&#34;</span>, <span style="color:#e6db74">&#34;/&#34;</span>))
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> file_paths<span style="color:#e6db74">&#39;&#39;&#39;gcp日志下载功能的一部分，获取所有日志文件&#39;&#39;&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/gcp&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">list_files</span>():
+</span></span><span style="display:flex;"><span>    files <span style="color:#f92672">=</span> get_all_files(<span style="color:#e6db74">&#34;/var/log/gcplogs&#34;</span>) <span style="color:#f92672">+</span> get_all_files(<span style="color:#e6db74">&#34;/var/log/AWSLogs&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> jsonify(files)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/repos/&lt;path:filename&gt;&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/conf/&lt;path:filename&gt;&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/downloadgcp/&lt;path:filename&gt;&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">download_file</span>(filename):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#获取请求的路径,判断是来自 clients 还是 conf</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> request<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>startswith(<span style="color:#e6db74">&#39;/repos/&#39;</span>):
+</span></span><span style="display:flex;"><span>        base_dir <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;/var/log/repos&#39;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">elif</span> request<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>startswith(<span style="color:#e6db74">&#39;/conf/&#39;</span>):
+</span></span><span style="display:flex;"><span>        base_dir <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;/var/log/conf&#39;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">elif</span> request<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>startswith(<span style="color:#e6db74">&#39;/downloadgcp/&#39;</span>):
+</span></span><span style="display:flex;"><span>        base_dir <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;/var/log&#39;</span>
+</span></span><span style="display:flex;"><span>    full_path <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(base_dir, filename)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#验证文件是否存在且是否为文件</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>exists(full_path) <span style="color:#f92672">and</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>isfile(full_path):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> send_file(full_path,as_attachment<span style="color:#f92672">=</span> <span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;File not found&#34;</span>, <span style="color:#ae81ff">404</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/query&#39;</span>, methods<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;GET&#39;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">query_data</span>():
+</span></span><span style="display:flex;"><span>    data <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;filter&#39;</span> <span style="color:#f92672">in</span> request<span style="color:#f92672">.</span>url:
+</span></span><span style="display:flex;"><span>        condition0fQuery <span style="color:#f92672">=</span> request<span style="color:#f92672">.</span>args<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;filter&#39;</span>)
+</span></span><span style="display:flex;"><span>        condition0fQuery<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;=&#39;</span>)[θ]
+</span></span><span style="display:flex;"><span>        condition0fQuery<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;=&#39;</span>)[<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> conditionOfQuery:
+</span></span><span style="display:flex;"><span>            sql<span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;select name, extip, intip from gcpinfo Where &#34;</span> <span style="color:#f92672">+</span> condition0fQuery<span style="color:#f92672">.</span> split(<span style="color:#e6db74">&#39;=&#39;</span>)[θ] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;=&#39;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> conditionOfQuery<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;=&#39;</span>)[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> record <span style="color:#f92672">in</span> executeMysqlData(<span style="color:#ae81ff">4</span>,<span style="color:#e6db74">&#39; read&#39;</span>, sql):
+</span></span><span style="display:flex;"><span>                data[record[θ]] <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;extip&#34;</span>: record[<span style="color:#ae81ff">1</span>], <span style="color:#e6db74">&#34;intip&#34;</span>: record[<span style="color:#ae81ff">2</span>]}
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> jsonify(data)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> jsonify(message<span style="color:#f92672">=</span><span style="color:#e6db74">&#39; Please provide filter criteria&#39;</span>), <span style="color:#ae81ff">400</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>        sql<span style="color:#f92672">=</span> <span style="color:#e6db74">&#34; select name, extip, intip from gcpinfo&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> record <span style="color:#f92672">in</span> executeMysqlData(<span style="color:#ae81ff">4</span>,<span style="color:#e6db74">&#39; read&#39;</span>, sql):
+</span></span><span style="display:flex;"><span>            data[record[θ]] <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;extip&#34;</span>: record[<span style="color:#ae81ff">1</span>], <span style="color:#e6db74">&#34;intip&#34;</span>: record[<span style="color:#ae81ff">2</span>]}
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> jsonify(data)
+</span></span><span style="display:flex;"><span>app<span style="color:#f92672">.</span>run(host<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;10.170.0.2&#39;</span>, port<span style="color:#f92672">=</span><span style="color:#ae81ff">1080</span>)
+</span></span></code></pre></div>
+      </section>
+      <div class="gblog-post__readmore">
+        
+      </div>
+
+      <footer class="gblog-post__footer">
+        <div class="flex flex-wrap align-center gblog-post__meta">
+          <span class="flex align-center no-wrap gblog-post__meta--update">
+  <svg class="gblog-icon gblog_date"><use xlink:href="#gblog_date"></use></svg>
+  <span class="gblog-post__tag">
+    <time datetime="2025-02-10T10:00:00&#43;08:00">
+      
+      Feb 10, 2025
+    </time>
+  </span>
+</span>
+
+<span class="flex align-center no-wrap gblog-post__meta--readtime">
+  <svg class="gblog-icon gblog_timer"><use xlink:href="#gblog_timer"></use></svg>
+  <span class="gblog-post__tag">3 min read</span>
+</span>
+
+
+
+
+
+
+
+
   
     
+    
+      
+        <span class="flex align-center no-wrap gblog-post__meta--tag">
+          <svg class="gblog-icon gblog_bookmark"><use xlink:href="#gblog_bookmark"></use></svg>
+          
+  <span class="gblog-post__tag gblog-button gblog-button--regular">
+    <a
+      class="gblog-button__link"
+      href="/tags/python/"
+      title="All posts tagged with 'Python'"
+    >
+      Python
+    </a>
+  </span>
+
+        </span>
+      
     
     
   
@@ -401,11 +1738,11 @@
 
       <section class="gblog-markdown">
         <div class="flex align-center gblog-post__anchorwrap">
-    <h1 id="基础接口脚本"
+    <h1 id="基于python3写的基础接口脚本"
     >
-        基础接口脚本
+        基于Python3写的基础接口脚本
     </h1>
-    <a data-clipboard-text="http://localhost:1313/posts/basicinterface/#基础接口脚本" class="gblog-post__anchor clip flex align-center" aria-label="Anchor 基础接口脚本" href="#%e5%9f%ba%e7%a1%80%e6%8e%a5%e5%8f%a3%e8%84%9a%e6%9c%ac">
+    <a data-clipboard-text="http://localhost:1313/posts/basicinterface/#基于python3写的基础接口脚本" class="gblog-post__anchor clip flex align-center" aria-label="Anchor 基于Python3写的基础接口脚本" href="#%e5%9f%ba%e4%ba%8epython3%e5%86%99%e7%9a%84%e5%9f%ba%e7%a1%80%e6%8e%a5%e5%8f%a3%e8%84%9a%e6%9c%ac">
         <svg class="gblog-icon gblog_link"><use xlink:href="#gblog_link"></use></svg>
     </a>
 </div>
@@ -599,9 +1936,9 @@
           <span class="flex align-center no-wrap gblog-post__meta--update">
   <svg class="gblog-icon gblog_date"><use xlink:href="#gblog_date"></use></svg>
   <span class="gblog-post__tag">
-    <time datetime="0001-01-01T00:00:00Z">
+    <time datetime="2025-02-08T14:00:00&#43;08:00">
       
-      Jan 1, 0001
+      Feb 8, 2025
     </time>
   </span>
 </span>
@@ -640,10 +1977,6 @@
     
     
   
-    
-    
-    
-  
 
 
 
@@ -661,8 +1994,13 @@
   <div class="gblog-paging__item gblog-paging__item--prev">
     
   </div>
-  <div class="gblog-paging__state">Page 1 of 1</div>
+  <div class="gblog-paging__state">Page 1 of 2</div>
   <div class="gblog-paging__item gblog-paging__item--next">
+    
+      <a class="flex-inline align-center fake-link no-wrap" href="/posts/page/2/">
+        NEXT
+        <i class="gblog-icon">gblog_keyboard_arrow_right</i>
+      </a>
     
   </div>
 </nav>
