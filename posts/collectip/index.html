@@ -11,9 +11,11 @@
 <meta name="referrer" content="no-referrer" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="generator" content="Hugo 0.143.1">
-  <meta name="robots" content="noindex, nofollow" />
+  <meta name="robots" content="index, follow" />
+  <meta name="description" content=" 收集网络管理软件上的网段信息 收集网络管理软件上的网段信息 需要用到pubapi来写入数据库 不适用于所有环境，脚本只做技术储备
+import mysql.connector import requests, json from requests.packages import urllib3 from Basicinterface import executeMysqlData #从地址库系统里定时拉数据出来，更新到自己的数据库里，如果有自己的网段也可以手动加进去，后续如果地址用处变更则会自动更新相关的条目，如果没有则会新建 apiToken = &#39;33cbb6a54b5fa924e5be1a0917d0b856&#39; server= &#39;&lt;serverUrl&gt;&#39; serverQuery = [{&#39;serverIP&#39;:server,&#39;apiToken&#39;:apiToken}] urllib3.disable_warnings() n = 1 subnetDict = {} for i in serverQuery: while 1: try: response = requests.get(f&#39;https://{i[&#39;serverIP&#39;]}:8861/api/json/ipam/getAllSubnetSummary?apiKey={i[&#39;apiToken&#39;]}&amp;&amp;rows=100&amp;page={n}&#39;,verify= False) #print (json.loads(response.text)[&#34; records&#34;]) except: print(f&#39;{i[&#39;serverIP&#39;]}获取失败!&#39; try: jsonServerData = json.loads(response.text)[&#39;rows&#39;] except: print(f&#39;{i[&#39;serverIP&#39;]}转换成 json失败!!&#39;) jsonServerData = [] if len(jsonServerData) != θ: for j in jsonServerData: subnetCidr = j[&#39;subnet-address-cidr&#39;] if subnetCidr not in subnetDict: subnetDict[subnetCidr] = {} subnetDict[subnetCidr][&#39;subnetName&#39;] = j[&#39;subnet-name&#39;] n &#43;= 1 else: n = 1 break for i in subnetDict: #查询数据是否有重复，如没有就写入，否则跳过 subnets = &#34;&#39;&#34;&#43; i &#43; &#34;&#39;&#34; nameOfSubnet = &#34;&#39;&#34; &#43; subnetDict[i][&#39;subnetName&#39;] &#43; &#34;&#39;&#34; querySubnet = f&#34;SELECT * from IPStatus WHERE subnet = {subnets}&#34; result = readMysqlData(1,querySubnet) if len(result) == θ : sql= f&#34;&#34;&#34;INSERT INTO IPStatus (subnet, name) VALUES ({&#34;&#39;&#34;&#43; i &#43; &#34;&#39;&#34;},{&#34;&#39;&#34; &#43; name &#43; &#34;&#39;&#34;})&#34;&#34;&#34; executeMysqlData(3,&#39;write&#39;,sql) elif result[θ][2] == &#34;&#34; or result[θ][2] != subnetDict[i][&#39;subnetName&#39;]: sql= f&#34;&#34;&#34;UPDATE IPStatus set name = {&#34;&#39;&#34; &#43; nameOfSubnet &#43; &#34;&#39;&#34;} WHERE subnet = {&#34;&#39;&#34; &#43; subnet &#43; &#34;&#39;&#34;}&#34;&#34;&#34; executeMysqlData(3,&#39;write&#39;,sql) " />
 
-    <title>Categories | MyTreeHoles</title>
+    <title>收集网络管理软件上的网段信息 | MyTreeHoles</title>
 
     <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg" />
 <link
@@ -34,19 +36,67 @@
     
   <meta
     property="og:title"
-    content="Categories"
+    content="收集网络管理软件上的网段信息"
   />
   <meta property="og:site_name" content="MyTreeHoles" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="http://localhost:1313/categories/" />
+  <meta property="og:description" content=" 收集网络管理软件上的网段信息 收集网络管理软件上的网段信息 需要用到pubapi来写入数据库 不适用于所有环境，脚本只做技术储备
+import mysql.connector import requests, json from requests.packages import urllib3 from Basicinterface import executeMysqlData #从地址库系统里定时拉数据出来，更新到自己的数据库里，如果有自己的网段也可以手动加进去，后续如果地址用处变更则会自动更新相关的条目，如果没有则会新建 apiToken = &#39;33cbb6a54b5fa924e5be1a0917d0b856&#39; server= &#39;&lt;serverUrl&gt;&#39; serverQuery = [{&#39;serverIP&#39;:server,&#39;apiToken&#39;:apiToken}] urllib3.disable_warnings() n = 1 subnetDict = {} for i in serverQuery: while 1: try: response = requests.get(f&#39;https://{i[&#39;serverIP&#39;]}:8861/api/json/ipam/getAllSubnetSummary?apiKey={i[&#39;apiToken&#39;]}&amp;&amp;rows=100&amp;page={n}&#39;,verify= False) #print (json.loads(response.text)[&#34; records&#34;]) except: print(f&#39;{i[&#39;serverIP&#39;]}获取失败!&#39; try: jsonServerData = json.loads(response.text)[&#39;rows&#39;] except: print(f&#39;{i[&#39;serverIP&#39;]}转换成 json失败!!&#39;) jsonServerData = [] if len(jsonServerData) != θ: for j in jsonServerData: subnetCidr = j[&#39;subnet-address-cidr&#39;] if subnetCidr not in subnetDict: subnetDict[subnetCidr] = {} subnetDict[subnetCidr][&#39;subnetName&#39;] = j[&#39;subnet-name&#39;] n &#43;= 1 else: n = 1 break for i in subnetDict: #查询数据是否有重复，如没有就写入，否则跳过 subnets = &#34;&#39;&#34;&#43; i &#43; &#34;&#39;&#34; nameOfSubnet = &#34;&#39;&#34; &#43; subnetDict[i][&#39;subnetName&#39;] &#43; &#34;&#39;&#34; querySubnet = f&#34;SELECT * from IPStatus WHERE subnet = {subnets}&#34; result = readMysqlData(1,querySubnet) if len(result) == θ : sql= f&#34;&#34;&#34;INSERT INTO IPStatus (subnet, name) VALUES ({&#34;&#39;&#34;&#43; i &#43; &#34;&#39;&#34;},{&#34;&#39;&#34; &#43; name &#43; &#34;&#39;&#34;})&#34;&#34;&#34; executeMysqlData(3,&#39;write&#39;,sql) elif result[θ][2] == &#34;&#34; or result[θ][2] != subnetDict[i][&#39;subnetName&#39;]: sql= f&#34;&#34;&#34;UPDATE IPStatus set name = {&#34;&#39;&#34; &#43; nameOfSubnet &#43; &#34;&#39;&#34;} WHERE subnet = {&#34;&#39;&#34; &#43; subnet &#43; &#34;&#39;&#34;}&#34;&#34;&#34; executeMysqlData(3,&#39;write&#39;,sql) " />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/posts/collectip/" />
 
-
+<meta property="article:section" content="Posts" />
+    <meta
+      property="article:published_time"
+      content="2025-02-11T10:00:00+08:00"
+    />
+    <meta
+      property="article:modified_time"
+      content="2025-02-11T10:00:00+08:00"
+    />
 
 
   <meta name="twitter:card" content="summary" />
-<meta name="twitter:title" content="Categories" />
+<meta name="twitter:title" content="收集网络管理软件上的网段信息" />
+  <meta name="twitter:description" content=" 收集网络管理软件上的网段信息 收集网络管理软件上的网段信息 需要用到pubapi来写入数据库 不适用于所有环境，脚本只做技术储备
+import mysql.connector import requests, json from requests.packages import urllib3 from Basicinterface import executeMysqlData #从地址库系统里定时拉数据出来，更新到自己的数据库里，如果有自己的网段也可以手动加进去，后续如果地址用处变更则会自动更新相关的条目，如果没有则会新建 apiToken = &#39;33cbb6a54b5fa924e5be1a0917d0b856&#39; server= &#39;&lt;serverUrl&gt;&#39; serverQuery = [{&#39;serverIP&#39;:server,&#39;apiToken&#39;:apiToken}] urllib3.disable_warnings() n = 1 subnetDict = {} for i in serverQuery: while 1: try: response = requests.get(f&#39;https://{i[&#39;serverIP&#39;]}:8861/api/json/ipam/getAllSubnetSummary?apiKey={i[&#39;apiToken&#39;]}&amp;&amp;rows=100&amp;page={n}&#39;,verify= False) #print (json.loads(response.text)[&#34; records&#34;]) except: print(f&#39;{i[&#39;serverIP&#39;]}获取失败!&#39; try: jsonServerData = json.loads(response.text)[&#39;rows&#39;] except: print(f&#39;{i[&#39;serverIP&#39;]}转换成 json失败!!&#39;) jsonServerData = [] if len(jsonServerData) != θ: for j in jsonServerData: subnetCidr = j[&#39;subnet-address-cidr&#39;] if subnetCidr not in subnetDict: subnetDict[subnetCidr] = {} subnetDict[subnetCidr][&#39;subnetName&#39;] = j[&#39;subnet-name&#39;] n &#43;= 1 else: n = 1 break for i in subnetDict: #查询数据是否有重复，如没有就写入，否则跳过 subnets = &#34;&#39;&#34;&#43; i &#43; &#34;&#39;&#34; nameOfSubnet = &#34;&#39;&#34; &#43; subnetDict[i][&#39;subnetName&#39;] &#43; &#34;&#39;&#34; querySubnet = f&#34;SELECT * from IPStatus WHERE subnet = {subnets}&#34; result = readMysqlData(1,querySubnet) if len(result) == θ : sql= f&#34;&#34;&#34;INSERT INTO IPStatus (subnet, name) VALUES ({&#34;&#39;&#34;&#43; i &#43; &#34;&#39;&#34;},{&#34;&#39;&#34; &#43; name &#43; &#34;&#39;&#34;})&#34;&#34;&#34; executeMysqlData(3,&#39;write&#39;,sql) elif result[θ][2] == &#34;&#34; or result[θ][2] != subnetDict[i][&#39;subnetName&#39;]: sql= f&#34;&#34;&#34;UPDATE IPStatus set name = {&#34;&#39;&#34; &#43; nameOfSubnet &#43; &#34;&#39;&#34;} WHERE subnet = {&#34;&#39;&#34; &#43; subnet &#43; &#34;&#39;&#34;}&#34;&#34;&#34; executeMysqlData(3,&#39;write&#39;,sql) " />
 
-
+<script type="application/ld+json">
+  {
+      "@context": "http://schema.org",
+      "@type": "BlogPosting",
+      "articleSection": "Posts",
+      "name": "收集网络管理软件上的网段信息",
+      "url" : "http://localhost:1313/posts/collectip/",
+      "headline": "收集网络管理软件上的网段信息",
+      "description": " 收集网络管理软件上的网段信息 收集网络管理软件上的网段信息 需要用到pubapi来写入数据库 不适用于所有环境，脚本只做技术储备\nimport mysql.connector import requests, json from requests.packages import urllib3 from Basicinterface import executeMysqlData #从地址库系统里定时拉数据出来，更新到自己的数据库里，如果有自己的网段也可以手动加进去，后续如果地址用处变更则会自动更新相关的条目，如果没有则会新建 apiToken = \u002733cbb6a54b5fa924e5be1a0917d0b856\u0027 server= \u0027\u003cserverUrl\u003e\u0027 serverQuery = [{\u0027serverIP\u0027:server,\u0027apiToken\u0027:apiToken}] urllib3.disable_warnings() n = 1 subnetDict = {} for i in serverQuery: while 1: try: response = requests.get(f\u0027https:\/\/{i[\u0027serverIP\u0027]}:8861\/api\/json\/ipam\/getAllSubnetSummary?apiKey={i[\u0027apiToken\u0027]}\u0026\u0026rows=100\u0026page={n}\u0027,verify= False) #print (json.loads(response.text)[\u0022 records\u0022]) except: print(f\u0027{i[\u0027serverIP\u0027]}获取失败!\u0027 try: jsonServerData = json.loads(response.text)[\u0027rows\u0027] except: print(f\u0027{i[\u0027serverIP\u0027]}转换成 json失败!!\u0027) jsonServerData = [] if len(jsonServerData) != θ: for j in jsonServerData: subnetCidr = j[\u0027subnet-address-cidr\u0027] if subnetCidr not in subnetDict: subnetDict[subnetCidr] = {} subnetDict[subnetCidr][\u0027subnetName\u0027] = j[\u0027subnet-name\u0027] n \u002b= 1 else: n = 1 break for i in subnetDict: #查询数据是否有重复，如没有就写入，否则跳过 subnets = \u0022\u0027\u0022\u002b i \u002b \u0022\u0027\u0022 nameOfSubnet = \u0022\u0027\u0022 \u002b subnetDict[i][\u0027subnetName\u0027] \u002b \u0022\u0027\u0022 querySubnet = f\u0022SELECT * from IPStatus WHERE subnet = {subnets}\u0022 result = readMysqlData(1,querySubnet) if len(result) == θ : sql= f\u0022\u0022\u0022INSERT INTO IPStatus (subnet, name) VALUES ({\u0022\u0027\u0022\u002b i \u002b \u0022\u0027\u0022},{\u0022\u0027\u0022 \u002b name \u002b \u0022\u0027\u0022})\u0022\u0022\u0022 executeMysqlData(3,\u0027write\u0027,sql) elif result[θ][2] == \u0022\u0022 or result[θ][2] != subnetDict[i][\u0027subnetName\u0027]: sql= f\u0022\u0022\u0022UPDATE IPStatus set name = {\u0022\u0027\u0022 \u002b nameOfSubnet \u002b \u0022\u0027\u0022} WHERE subnet = {\u0022\u0027\u0022 \u002b subnet \u002b \u0022\u0027\u0022}\u0022\u0022\u0022 executeMysqlData(3,\u0027write\u0027,sql) ",
+      "wordCount" : "169",
+      "inLanguage": "en",
+      "isFamilyFriendly": "true",
+      "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "http://localhost:1313/posts/collectip/"
+      },
+      "keywords" : [ "Python" ],
+      "author" : [
+      ],
+      "copyrightHolder" : "MyTreeHoles",
+      "copyrightYear" : "2025",
+      "dateCreated": "2025-02-11T10:00:00.00Z",
+      "datePublished": "2025-02-11T10:00:00.00Z",
+      "dateModified": "2025-02-11T10:00:00.00Z",
+      "publisher":{
+          "@type":"Organization",
+          "name": "MyTreeHoles",
+          "url": "http://localhost:1313/",
+          "logo": {
+              "@type": "ImageObject",
+              "url": "http://localhost:1313/brand.svg",
+              "width":"32",
+              "height":"32"
+          }
+      }
+  }
+  </script>
 
 
     
@@ -118,7 +168,7 @@
   href="/custom.css"
   media="all"
 />
-  <link href="http://localhost:1313/categories/" rel="canonical" type="text/html" />
+  <link href="http://localhost:1313/posts/collectip/" rel="canonical" type="text/html" />
     <link href="http://localhost:1313/index.xml" rel="alternate" type="application/rss+xml" title="MyTreeHoles rss Feed" />
 
 <!-- Made with Geekblog theme https://github.com/thegeeklab/hugo-geekblog -->
@@ -238,85 +288,130 @@
 
       <main class="gblog-page container">
         
+  <article class="gblog-post">
+    <header class="gblog-post__header">
+      
+      
+
+
+      <h1 class="gblog-post__title">收集网络管理软件上的网段信息</h1>
+
+      
+        <div class="flex flex-wrap align-center gblog-post__meta gblog-post__meta--head">
+          <span class="flex align-center no-wrap gblog-post__meta--update">
+  <svg class="gblog-icon gblog_date"><use xlink:href="#gblog_date"></use></svg>
+  <span class="gblog-post__tag">
+    <time datetime="2025-02-11T10:00:00&#43;08:00">
+      
+      Feb 11, 2025
+    </time>
+  </span>
+</span>
+
+<span class="flex align-center no-wrap gblog-post__meta--readtime">
+  <svg class="gblog-icon gblog_timer"><use xlink:href="#gblog_timer"></use></svg>
+  <span class="gblog-post__tag">1 min read</span>
+</span>
+
+
+
+
+
+
+
+
   
-  
-    <article class="gblog-post">
-      <header class="gblog-post__header">
-        <h1 class="gblog-post__title">
-          <a href="/categories/%E5%8D%9A%E5%AE%A2%E7%9B%B8%E5%85%B3/">博客相关</a>
-        </h1>
-      </header>
-
-      <footer class="gblog-post__meta flex align-center">
-        <span class="flex align-center no-wrap">
-          
-          <svg class="gblog-icon gblog_tag"><use xlink:href="#gblog_tag"></use></svg>
-          <span class="gblog-post__tag">
-            1
-            post
-          </span>
-        </span>
-
-        <span class="flex align-center no-wrap">
-          <svg class="gblog-icon gblog_star"><use xlink:href="#gblog_star"></use></svg>
-          <span>
-            
-            
-              <a href="/posts/howtouse/">如何使用Hugo搭建自己的静态博客</a>
-            
-            <i>by</i>
-            
-            
-          </span>
-        </span>
-      </footer>
-    </article>
-  
-    <article class="gblog-post">
-      <header class="gblog-post__header">
-        <h1 class="gblog-post__title">
-          <a href="/categories/%E8%84%9A%E6%9C%AC%E7%9B%B8%E5%85%B3/">脚本相关</a>
-        </h1>
-      </header>
-
-      <footer class="gblog-post__meta flex align-center">
-        <span class="flex align-center no-wrap">
-          
-          <svg class="gblog-icon gblog_tag"><use xlink:href="#gblog_tag"></use></svg>
-          <span class="gblog-post__tag">
-            18
-            posts
-          </span>
-        </span>
-
-        <span class="flex align-center no-wrap">
-          <svg class="gblog-icon gblog_star"><use xlink:href="#gblog_star"></use></svg>
-          <span>
-            
-            
-              <a href="/posts/basicinterface/">基础接口脚本</a>
-            
-            <i>by</i>
-            
-            
-          </span>
-        </span>
-      </footer>
-    </article>
-  
-  
-
-
-<nav class="gblog-paging flex flex-even align-center" role="navigation">
-  <div class="gblog-paging__item gblog-paging__item--prev">
     
-  </div>
-  <div class="gblog-paging__state">Page 1 of 1</div>
-  <div class="gblog-paging__item gblog-paging__item--next">
     
-  </div>
-</nav>
+      
+        <span class="flex align-center no-wrap gblog-post__meta--tag">
+          <svg class="gblog-icon gblog_bookmark"><use xlink:href="#gblog_bookmark"></use></svg>
+          
+  <span class="gblog-post__tag gblog-button gblog-button--regular">
+    <a
+      class="gblog-button__link"
+      href="/tags/python/"
+      title="All posts tagged with 'Python'"
+    >
+      Python
+    </a>
+  </span>
 
+        </span>
+      
+    
+    
+  
+
+
+
+
+
+
+        </div>
+      
+    </header>
+    <section class="gblog-markdown">
+      <div class="flex align-center gblog-post__anchorwrap">
+    <h1 id="收集网络管理软件上的网段信息"
+    >
+        收集网络管理软件上的网段信息
+    </h1>
+    <a data-clipboard-text="http://localhost:1313/posts/collectip/#收集网络管理软件上的网段信息" class="gblog-post__anchor clip flex align-center" aria-label="Anchor 收集网络管理软件上的网段信息" href="#%e6%94%b6%e9%9b%86%e7%bd%91%e7%bb%9c%e7%ae%a1%e7%90%86%e8%bd%af%e4%bb%b6%e4%b8%8a%e7%9a%84%e7%bd%91%e6%ae%b5%e4%bf%a1%e6%81%af">
+        <svg class="gblog-icon gblog_link"><use xlink:href="#gblog_link"></use></svg>
+    </a>
+</div>
+<p>收集网络管理软件上的网段信息
+需要用到pubapi来写入数据库
+不适用于所有环境，脚本只做技术储备</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> mysql.connector
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> requests<span style="color:#f92672">,</span> json
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> requests.packages <span style="color:#f92672">import</span> urllib3
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> Basicinterface <span style="color:#f92672">import</span> executeMysqlData
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#从地址库系统里定时拉数据出来，更新到自己的数据库里，如果有自己的网段也可以手动加进去，后续如果地址用处变更则会自动更新相关的条目，如果没有则会新建</span>
+</span></span><span style="display:flex;"><span>apiToken <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;33cbb6a54b5fa924e5be1a0917d0b856&#39;</span>
+</span></span><span style="display:flex;"><span>server<span style="color:#f92672">=</span>  <span style="color:#e6db74">&#39;&lt;serverUrl&gt;&#39;</span>
+</span></span><span style="display:flex;"><span>serverQuery <span style="color:#f92672">=</span> [{<span style="color:#e6db74">&#39;serverIP&#39;</span>:server,<span style="color:#e6db74">&#39;apiToken&#39;</span>:apiToken}]
+</span></span><span style="display:flex;"><span>urllib3<span style="color:#f92672">.</span>disable_warnings()
+</span></span><span style="display:flex;"><span>n <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>subnetDict <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> serverQuery:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> <span style="color:#ae81ff">1</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>            response <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>get(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;https://</span><span style="color:#e6db74">{</span>i[<span style="color:#e6db74">&#39;serverIP&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">:8861/api/json/ipam/getAllSubnetSummary?apiKey=</span><span style="color:#e6db74">{</span>i[<span style="color:#e6db74">&#39;apiToken&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;&amp;rows=100&amp;page=</span><span style="color:#e6db74">{</span>n<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>,verify<span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">#print (json.loads(response.text)[&#34; records&#34;])</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span>:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">{</span>i[<span style="color:#e6db74">&#39;serverIP&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">获取失败!&#39;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>            jsonServerData <span style="color:#f92672">=</span> json<span style="color:#f92672">.</span>loads(response<span style="color:#f92672">.</span>text)[<span style="color:#e6db74">&#39;rows&#39;</span>]
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span>:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">{</span>i[<span style="color:#e6db74">&#39;serverIP&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">转换成 json失败!!&#39;</span>)
+</span></span><span style="display:flex;"><span>            jsonServerData <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> len(jsonServerData) <span style="color:#f92672">!=</span> θ:
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">for</span> j <span style="color:#f92672">in</span> jsonServerData:
+</span></span><span style="display:flex;"><span>                    subnetCidr <span style="color:#f92672">=</span> j[<span style="color:#e6db74">&#39;subnet-address-cidr&#39;</span>]
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> subnetCidr <span style="color:#f92672">not</span> <span style="color:#f92672">in</span> subnetDict:
+</span></span><span style="display:flex;"><span>                        subnetDict[subnetCidr] <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>                    subnetDict[subnetCidr][<span style="color:#e6db74">&#39;subnetName&#39;</span>] <span style="color:#f92672">=</span> j[<span style="color:#e6db74">&#39;subnet-name&#39;</span>]
+</span></span><span style="display:flex;"><span>                n <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                n <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> subnetDict:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#查询数据是否有重复，如没有就写入，否则跳过</span>
+</span></span><span style="display:flex;"><span>    subnets <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#f92672">+</span> i <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span>
+</span></span><span style="display:flex;"><span>    nameOfSubnet <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> subnetDict[i][<span style="color:#e6db74">&#39;subnetName&#39;</span>] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span>
+</span></span><span style="display:flex;"><span>    querySubnet <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;SELECT * from IPStatus WHERE subnet = </span><span style="color:#e6db74">{</span>subnets<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> readMysqlData(<span style="color:#ae81ff">1</span>,querySubnet)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> len(result) <span style="color:#f92672">==</span> θ :
+</span></span><span style="display:flex;"><span>        sql<span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;&#34;&#34;INSERT INTO IPStatus (subnet, name) VALUES (</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#f92672">+</span> i <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">,</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> name <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">)&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        executeMysqlData(<span style="color:#ae81ff">3</span>,<span style="color:#e6db74">&#39;write&#39;</span>,sql)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">elif</span> result[θ][<span style="color:#ae81ff">2</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;&#34;</span> <span style="color:#f92672">or</span> result[θ][<span style="color:#ae81ff">2</span>] <span style="color:#f92672">!=</span> subnetDict[i][<span style="color:#e6db74">&#39;subnetName&#39;</span>]:
+</span></span><span style="display:flex;"><span>        sql<span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;&#34;&#34;UPDATE IPStatus set name = </span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> nameOfSubnet <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> WHERE subnet = </span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> subnet <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        executeMysqlData(<span style="color:#ae81ff">3</span>,<span style="color:#e6db74">&#39;write&#39;</span>,sql)
+</span></span></code></pre></div>
+    </section>
+  </article>
 
       </main>
 
